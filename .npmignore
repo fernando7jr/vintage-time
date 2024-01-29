@@ -1,0 +1,5 @@
+.prettierignore
+*.test.js
+*.test.mjs
+__tests__
+jest.config.json

@@ -1,0 +1,45 @@
+{
+    "name": "vintage-time",
+    "version": "0.1.0",
+    "description": "DateTime x DateOnly library with locale support. Compatible with sequelize, joi, momentjs and plain javascript Dates",
+    "type": "commonjs",
+    "main": "index.cjs",
+    "module": "index.mjs",
+    "exports": {
+        ".": {
+            "require": "./index.cjs",
+            "default": "./index.mjs"
+        }
+    },
+    "scripts": {
+        "test": "jest --forceExit --detectOpenHandles --coverage"
+    },
+    "keywords": [
+        "date",
+        "time",
+        "date-time",
+        "date-only",
+        "timezone",
+        "locale",
+        "calendar",
+        "moment",
+        "sequelize",
+        "joi"
+    ],
+    "author": "metadeta96",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/fernando7jr/vintage-time.git"
+    },
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "joi": "^17.12.0",
+        "sequelize": "6.35.2",
+        "sqlite3": "^5.1.7"
+    },
+    "peerDependencies": {
+        "joi": "^17.12.0",
+        "sequelize": "6.35.2"
+    }
+}
