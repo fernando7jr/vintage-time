@@ -4,6 +4,7 @@ const {LOCALE_FORMATS} = require('./locale-formats.cjs');
 const {DATE_ONLY_REGEX, DATE_TIME_REGEX, TIME_WITHOUT_ZONE_REGEX, extractTimezoneOffset} = require('./regex.cjs');
 const {__isDateTimeObject} = require('./utils/date-time.cjs');
 const {__isDateOnlyObject} = require('./utils/date-only.cjs');
+const {getLocalTimezone} = require('./utils/tz.cjs');
 
 /**
  * @typedef {moment.Moment} Moment
@@ -152,8 +153,8 @@ class DateTime {
      */
     static fromAnyDate(anyDate, locale) {
         if (!anyDate) return this.invalid();
-        else if (__isDateOnly(anyDate)) return this.fromDateOnly(anyDate, locale);
         else if (this.isDateTime(anyDate) || __isDateTimeObject(anyDate)) return this.fromDateTime(anyDate, locale);
+        else if (__isDateOnly(anyDate)) return this.fromDateOnly(anyDate, locale);
         else if (moment.isMoment(anyDate)) return this.fromMomentDate(anyDate, locale);
         else if (anyDate instanceof Date) return this.fromJsDate(anyDate, locale);
         else if (typeof anyDate === 'number') return this.fromJsDate(new Date(anyDate), locale);
@@ -212,7 +213,12 @@ class DateTime {
 
     get timezone() {
         if (this.isUTC) return 'UTC';
-        return this._innerDate.tz();
+        const tz = this._innerDate.tz();
+        if (tz) return tz;
+
+        const offset = this._innerDate.utcOffset();
+        if (offset === moment().utcOffset()) return getLocalTimezone();
+        return undefined;
     }
 
     get offset() {
@@ -390,6 +396,10 @@ class DateTime {
         return DateTime.fromMomentDate(moment.tz(this._innerDate, timezone));
     }
 
+    toUTC() {
+        return this.toTimezone('UTC');
+    }
+
     /**
      * Format a date to string representation
      * @param {string} format date format. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`
@@ -521,9 +531,9 @@ class DateTime {
         return this._innerDate.toDate();
     }
 
-    toISOString() {
+    toISOString(useUtc = false) {
         if (!this.isValid) return this._innerDate.toString();
-        return this._innerDate.toISOString();
+        return this._innerDate.toISOString(!useUtc);
     }
 
     toJSON() {
@@ -550,6 +560,7 @@ class DateTime {
             second: obj.seconds,
             millisecond: obj.milliseconds,
             offset: this.offset,
+            timezone: this.timezone,
         };
     }
 

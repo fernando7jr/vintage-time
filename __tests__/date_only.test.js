@@ -482,7 +482,7 @@ describe('DateOnly', () => {
             });
 
             it('should construct from a timestamp without a custom locale', () => {
-                const value = new Date('2023-09-05');
+                const value = new Date(2023, 8, 5);
                 const result = DateOnly.fromAnyDate(value.getTime());
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -495,7 +495,7 @@ describe('DateOnly', () => {
             });
 
             it('should construct from a timestamp with a custom locale', () => {
-                const value = new Date('2023-09-05');
+                const value = new Date(2023, 8, 5);
                 const result = DateOnly.fromAnyDate(value.getTime(), CUSTOM_LOCALE);
                 expect(result.toObject()).toEqual({
                     year: 2023,

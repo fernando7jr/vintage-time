@@ -129,16 +129,15 @@ export function __formatToDateOnly(anyDate, options = {}) {
 /**
  * Format a date to a date-time format
  * @param {AnyDate | null | undefined} anyDate any possible date
- * @param {(DateFormatingOptions & {includeTimeAndZone?: boolean}) | undefined} options optional formating options to customize the output
  * @param {string | boolean | undefined} options.locale optional locale string or boolean for whether locale should be applied or not
  * @param {string | undefined} options.format optional format string pattern. Defaults to DateTime default format
- * @param {boolean | undefined} options.toISOForm optional flag for forcing an ISOString output. Since it is a date-only the format string pattern will be `YYYY-MM-DD`
+ * @param {boolean | undefined} options.toISOForm optional flag for forcing an ISOString output
  * @returns {string}
  */
 export function __formatToDateTime(anyDate, options) {
     const {toISOForm = false, format} = options;
     if (toISOForm) {
-        return toDateTime(anyDate).toISOString();
+        return toDateTime(anyDate).toISOString(true);
     }
 
     const shouldApplyLocale = Boolean(options.locale);

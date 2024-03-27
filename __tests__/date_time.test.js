@@ -3,11 +3,15 @@ const moment = require('moment-timezone');
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
 const {toDateOnly, toDateTime, isDateValid} = require('../index.cjs');
+const {getLocalTimezone} = require('../utils/tz.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_LOCALE = 'en';
 const CUSTOM_LOCALE = 'x-pseudo';
 
+const UTC_TZ = 'UTC';
+const UTC_TZ_OFFSET = 'UTC';
+const DEFAULT_TZ = getLocalTimezone();
 const DEFAULT_TZ_OFFSET = ((o) => (o === '+00:00' ? 'UTC' : o))(moment().format('Z'));
 const CUSTOM_TZ = 'America/Sao_Paulo';
 const CUSTOM_TZ_OFFSET = moment().tz(CUSTOM_TZ).format('Z');
@@ -84,7 +88,7 @@ describe('DateTime', () => {
 
         describe('fromMomentDate', () => {
             it('should construct from a momentjs instance with time', () => {
-                const value = moment('2023-09-05 17:44:36.008Z');
+                const value = moment.utc('2023-09-05T17:44:36.008Z');
                 const result = DateTime.fromMomentDate(value);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -94,14 +98,15 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 8,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.008Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
             it('should construct from a momentjs instance without a custom locale', () => {
-                const value = moment('2023-09-05');
+                const value = moment.utc('2023-09-05');
                 const result = DateTime.fromMomentDate(value);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -111,14 +116,15 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
             it('should construct from a momentjs instance with a custom locale', () => {
-                const value = moment('2023-09-05');
+                const value = moment.utc('2023-09-05');
                 const result = DateTime.fromMomentDate(value, CUSTOM_LOCALE);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -128,7 +134,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -146,6 +153,7 @@ describe('DateTime', () => {
                     second: 36,
                     millisecond: 8,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: CUSTOM_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T20:44:36.008Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -163,7 +171,7 @@ describe('DateTime', () => {
         describe('fromJsDate', () => {
             it('should construct from a JS Date instance with time', () => {
                 const value = new Date('2023-09-05 17:44:36Z');
-                const result = DateTime.fromJsDate(value);
+                const result = DateTime.fromJsDate(value).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -172,7 +180,8 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -180,7 +189,7 @@ describe('DateTime', () => {
 
             it('should construct from a JS Date instance without a custom locale', () => {
                 const value = new Date('2023-09-05');
-                const result = DateTime.fromJsDate(value);
+                const result = DateTime.fromJsDate(value).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -189,7 +198,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -197,7 +207,7 @@ describe('DateTime', () => {
 
             it('should construct from a JS Date instance with a custom locale', () => {
                 const value = new Date('2023-09-05');
-                const result = DateTime.fromJsDate(value, CUSTOM_LOCALE);
+                const result = DateTime.fromJsDate(value, CUSTOM_LOCALE).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -206,7 +216,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -224,6 +235,7 @@ describe('DateTime', () => {
                     second: 36,
                     millisecond: 8,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: CUSTOM_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T20:44:36.008Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -248,7 +260,8 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: DEFAULT_TZ_OFFSET,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -265,7 +278,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: DEFAULT_TZ_OFFSET,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -282,7 +296,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: DEFAULT_TZ_OFFSET,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -307,8 +322,9 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 248,
                     offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:59.248Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:59.248').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -326,8 +342,9 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 248,
                     offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:59.248Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:59.248').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -351,6 +368,7 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 248,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: undefined,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T12:48:59.248Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -376,6 +394,7 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 248,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: CUSTOM_TZ,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T12:48:59.248Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -394,6 +413,7 @@ describe('DateTime', () => {
                     second: 36,
                     millisecond: 8,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: undefined,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T20:44:36.008Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -421,7 +441,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -438,7 +459,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -454,7 +476,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -470,7 +493,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -495,7 +519,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -513,7 +538,7 @@ describe('DateTime', () => {
 
         describe('fromAnyDate', () => {
             it('should construct from a momentjs instance with time', () => {
-                const value = moment('2023-09-05 17:44:36');
+                const value = moment.utc('2023-09-05 17:44:36');
                 const result = DateTime.fromAnyDate(value);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -523,14 +548,15 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
             it('should construct from a momentjs instance without a custom locale', () => {
-                const value = moment('2023-09-05');
+                const value = moment.utc('2023-09-05');
                 const result = DateTime.fromAnyDate(value);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -540,14 +566,15 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
             it('should construct from a momentjs instance with a custom locale', () => {
-                const value = moment('2023-09-05');
+                const value = moment.utc('2023-09-05');
                 const result = DateTime.fromAnyDate(value, CUSTOM_LOCALE);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -557,15 +584,16 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
             it('should construct from a JS Date instance with time', () => {
-                const value = new Date('2023-09-05 17:44:36');
-                const result = DateTime.fromAnyDate(value);
+                const value = new Date('2023-09-05T17:44:36.000Z');
+                const result = DateTime.fromAnyDate(value).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -574,7 +602,8 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -582,7 +611,7 @@ describe('DateTime', () => {
 
             it('should construct from a JS Date instance without a custom locale', () => {
                 const value = new Date('2023-09-05');
-                const result = DateTime.fromAnyDate(value);
+                const result = DateTime.fromAnyDate(value).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -591,7 +620,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -599,7 +629,7 @@ describe('DateTime', () => {
 
             it('should construct from a JS Date instance with a custom locale', () => {
                 const value = new Date('2023-09-05');
-                const result = DateTime.fromAnyDate(value, CUSTOM_LOCALE);
+                const result = DateTime.fromAnyDate(value, CUSTOM_LOCALE).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -608,7 +638,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -625,7 +656,8 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -642,7 +674,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -659,7 +692,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -676,7 +710,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -693,7 +728,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -710,15 +746,16 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
             it('should construct from a timestamp with time', () => {
-                const value = new Date('2023-09-05 17:44:36');
-                const result = DateTime.fromAnyDate(value.getTime());
+                const value = new Date('2023-09-05T17:44:36.000Z');
+                const result = DateTime.fromAnyDate(value.getTime()).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -727,7 +764,8 @@ describe('DateTime', () => {
                     minute: 44,
                     second: 36,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T17:44:36.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -736,7 +774,7 @@ describe('DateTime', () => {
 
             it('should construct from a timestamp without a custom locale', () => {
                 const value = new Date('2023-09-05');
-                const result = DateTime.fromAnyDate(value.getTime());
+                const result = DateTime.fromAnyDate(value.getTime()).toUTC();
                 expect(result.toObject()).toEqual({
                     year: 2023,
                     month: 9,
@@ -745,7 +783,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -753,7 +792,7 @@ describe('DateTime', () => {
             });
 
             it('should construct from a timestamp with a custom locale', () => {
-                const value = new Date('2023-09-05');
+                const value = new Date(2023, 8, 5);
                 const result = DateTime.fromAnyDate(value.getTime(), CUSTOM_LOCALE);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -763,9 +802,10 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
+                expect(result.toISOString(true)).toBe(value.toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
                 expect(result.toTimestamp()).toEqual(value.getTime());
             });
@@ -783,7 +823,8 @@ describe('DateTime', () => {
                         minute: 44,
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ_OFFSET,
+                        timezone: UTC_TZ,
                     });
                     expect(result.toJSON()).toBe(`${value.replace(' ', 'T')}${hasMilliseconds ? '' : '.000'}Z`);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -849,7 +890,8 @@ describe('DateTime', () => {
                         minute: 44,
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ_OFFSET,
+                        timezone: UTC_TZ,
                     });
                     expect(result.toJSON()).toBe(
                         `${value.slice(0, value.length - 1).replace(' ', 'T')}${hasMilliseconds ? '' : '.000'}Z`
@@ -871,7 +913,8 @@ describe('DateTime', () => {
                         minute: 44,
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ_OFFSET,
+                        timezone: UTC_TZ,
                     });
                     expect(result.toJSON()).toBe(`${value}${hasMilliseconds ? '' : '.000'}Z`);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -895,6 +938,7 @@ describe('DateTime', () => {
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
                         offset: '+14:00',
+                        timezone: undefined,
                     });
                     expect(result.toJSON()).toEqual(expected);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -918,6 +962,7 @@ describe('DateTime', () => {
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
                         offset: '-10:00',
+                        timezone: undefined,
                     });
                     expect(result.toJSON()).toEqual(expected);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -937,7 +982,8 @@ describe('DateTime', () => {
                         minute: 44,
                         second: 36,
                         millisecond: hasMilliseconds ? 123 : 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ_OFFSET,
+                        timezone: UTC_TZ,
                     });
                     expect(result.toJSON()).toBe(
                         `${value.slice(0, value.length - 1)}${hasMilliseconds ? '' : '.000'}Z`
@@ -956,7 +1002,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -972,7 +1019,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
                 });
                 expect(result.toJSON()).toBe('2023-09-05T00:00:00.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -990,9 +1038,10 @@ describe('DateTime', () => {
                     minute: 48,
                     second: 2,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:02.000Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:02.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1008,9 +1057,10 @@ describe('DateTime', () => {
                     minute: 48,
                     second: 59,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:59.000Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:59.000').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1024,9 +1074,10 @@ describe('DateTime', () => {
                     minute: 48,
                     second: 59,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:59.000Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:59.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1040,6 +1091,7 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 1,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: undefined,
                 });
                 expect(result.toObject()).toEqual({
                     year: 2020,
@@ -1050,6 +1102,7 @@ describe('DateTime', () => {
                     second: 59,
                     millisecond: 1,
                     offset: CUSTOM_TZ_OFFSET,
+                    timezone: undefined,
                 });
                 expect(result.toJSON()).toBe('2020-10-27T12:48:59.001Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -1068,9 +1121,10 @@ describe('DateTime', () => {
                     minute: 48,
                     second: 59,
                     millisecond: 248,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('2020-10-27T09:48:59.248Z');
+                expect(result.toJSON()).toBe(new Date('2020-10-27T09:48:59.248').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1100,9 +1154,10 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-02-11T00:00:00.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-02-11T00:00:00.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1116,9 +1171,10 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-02-11T00:00:00.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-02-11T00:00:00.000').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1132,9 +1188,10 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-11-02T00:00:00.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-11-02T00:00:00.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1148,9 +1205,10 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-11-02T00:00:00.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-11-02T00:00:00.000').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1164,9 +1222,10 @@ describe('DateTime', () => {
                     minute: 15,
                     second: 44,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-02-11T22:15:44.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-02-11T22:15:44.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1180,9 +1239,10 @@ describe('DateTime', () => {
                     minute: 15,
                     second: 44,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-02-11T22:15:44.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-02-11T22:15:44.000').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1196,9 +1256,10 @@ describe('DateTime', () => {
                     minute: 15,
                     second: 44,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-11-02T22:15:44.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-11-02T22:15:44.000').toISOString());
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1212,9 +1273,10 @@ describe('DateTime', () => {
                     minute: 15,
                     second: 44,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
                 });
-                expect(result.toJSON()).toBe('1998-11-02T22:15:44.000Z');
+                expect(result.toJSON()).toBe(new Date('1998-11-02T22:15:44.000').toISOString());
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
@@ -1229,6 +1291,7 @@ describe('DateTime', () => {
                     second: 44,
                     millisecond: 0,
                     offset: '+13:30',
+                    timezone: undefined,
                 });
                 expect(result.toJSON()).toBe('1998-11-02T08:45:44.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
@@ -1245,6 +1308,7 @@ describe('DateTime', () => {
                     second: 44,
                     millisecond: 0,
                     offset: '+13:30',
+                    timezone: undefined,
                 });
                 expect(result.toJSON()).toBe('1998-11-02T08:45:44.000Z');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
@@ -1290,29 +1354,58 @@ describe('DateTime', () => {
 
         describe('offset', () => {
             it('should get the default offset', () => {
-                const defaultValues = [DateTime.now(), DateTime.fromAnyDate('2025-12-17')];
-                expect(defaultValues.map((v) => v.offset)).toEqual(defaultValues.map(() => 'UTC'));
+                const values = [
+                    DateTime.now(),
+                    DateTime.fromAnyDate({
+                        year: 2024,
+                        month: 10,
+                        day: 3,
+                        hour: 4,
+                        minute: 5,
+                        second: 6,
+                        millisecond: 0,
+                    }),
+                ];
+                expect(values.map((v) => v.offset)).toEqual(values.map(() => DEFAULT_TZ_OFFSET));
+            });
+
+            it('should get UTC offset', () => {
+                const values = [DateTime.fromAnyDate('2025-12-17'), DateTime.fromDateOnly('2025-12-17')];
+                expect(values.map((v) => v.offset)).toEqual(values.map(() => UTC_TZ_OFFSET));
             });
 
             it('should get the custom offset', () => {
-                const defaultValues = [
-                    DateTime.now().toTimezone(CUSTOM_TZ),
-                    DateTime.fromAnyDate('2025-12-17T11:11:11+07:00'),
-                ];
-                expect(defaultValues.map((v) => v.offset)).toEqual([CUSTOM_TZ_OFFSET, '+07:00']);
+                const value = DateTime.now().toTimezone(CUSTOM_TZ);
+                expect(value.offset).toEqual(CUSTOM_TZ_OFFSET);
             });
 
             it('should not be settable', () => {
                 const dateTime = toDateTime.now();
                 dateTime.offset = CUSTOM_TZ_OFFSET;
-                expect(dateTime.offset).toBe('UTC');
+                expect(dateTime.offset).toBe(DEFAULT_TZ_OFFSET);
             });
         });
 
         describe('timezone', () => {
             it('should get the default timezone', () => {
-                const values = [DateTime.now(), DateTime.fromAnyDate('2025-12-17')];
-                expect(values.map((v) => v.timezone)).toEqual(values.map(() => 'UTC'));
+                const values = [
+                    DateTime.now(),
+                    DateTime.fromAnyDate({
+                        year: 2024,
+                        month: 10,
+                        day: 3,
+                        hour: 4,
+                        minute: 5,
+                        second: 6,
+                        millisecond: 0,
+                    }),
+                ];
+                expect(values.map((v) => v.timezone)).toEqual(values.map(() => DEFAULT_TZ));
+            });
+
+            it('should get UTC timezone', () => {
+                const values = [DateTime.fromAnyDate('2025-12-17'), DateTime.fromDateOnly('2025-12-17')];
+                expect(values.map((v) => v.timezone)).toEqual(values.map(() => UTC_TZ));
             });
 
             it('should get the custom timezone', () => {
@@ -1323,7 +1416,7 @@ describe('DateTime', () => {
             it('should not be settable', () => {
                 const dateTime = toDateTime.now();
                 dateTime.timezone = CUSTOM_TZ;
-                expect(dateTime.timezone).toBe('UTC');
+                expect(dateTime.timezone).toBe(DEFAULT_TZ);
             });
         });
 
@@ -1398,7 +1491,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1413,7 +1507,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1428,7 +1523,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1443,7 +1539,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1460,7 +1557,8 @@ describe('DateTime', () => {
                         minute: 0,
                         second: 0,
                         millisecond: 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1476,7 +1574,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1493,7 +1592,8 @@ describe('DateTime', () => {
                         minute: 15,
                         second: 0,
                         millisecond: 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1511,7 +1611,8 @@ describe('DateTime', () => {
                         minute: 15,
                         second: 47,
                         millisecond: 0,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1539,7 +1640,8 @@ describe('DateTime', () => {
                     minute: 59,
                     second: 59,
                     millisecond: 999,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1554,7 +1656,8 @@ describe('DateTime', () => {
                     minute: 59,
                     second: 59,
                     millisecond: 999,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1569,7 +1672,8 @@ describe('DateTime', () => {
                     minute: 59,
                     second: 59,
                     millisecond: 999,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1584,7 +1688,8 @@ describe('DateTime', () => {
                     minute: 59,
                     second: 59,
                     millisecond: 999,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1601,7 +1706,8 @@ describe('DateTime', () => {
                         minute: 59,
                         second: 59,
                         millisecond: 999,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1617,7 +1723,8 @@ describe('DateTime', () => {
                     minute: 59,
                     second: 59,
                     millisecond: 999,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1634,7 +1741,8 @@ describe('DateTime', () => {
                         minute: 15,
                         second: 59,
                         millisecond: 999,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1652,7 +1760,8 @@ describe('DateTime', () => {
                         minute: 15,
                         second: 47,
                         millisecond: 999,
-                        offset: 'UTC',
+                        offset: UTC_TZ,
+                        timezone: UTC_TZ_OFFSET,
                     });
                 }
             );
@@ -1680,7 +1789,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1694,7 +1804,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1719,7 +1830,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
@@ -1733,7 +1845,8 @@ describe('DateTime', () => {
                     minute: 0,
                     second: 0,
                     millisecond: 0,
-                    offset: 'UTC',
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
                 });
             });
 
