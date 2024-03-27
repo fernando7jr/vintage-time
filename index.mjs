@@ -4,6 +4,8 @@ import {DateOnly} from './date-only.mjs';
 import {DateTime} from './date-time.mjs';
 
 export {LOCALE_FORMATS} from './locale-formats.mjs';
+export {DateOnly} from './date-only.mjs';
+export {DateTime} from './date-time.mjs';
 
 /** @typedef {Date | import('moment-timezone').Moment | DateOnly | DateTime | string | number} AnyDate */
 /** @typedef {{locale?: string | boolean; toISOForm?: boolean; format?: string}} DateFormatingOptions */
@@ -14,7 +16,7 @@ export {LOCALE_FORMATS} from './locale-formats.mjs';
  * Other libraries might do so but need to be handled in this code too.
  * If there is no locale then undefined is returned which also means the default locale `en` should be used instead.
  * @param {AnyDate | null | undefined} anyDate any possible date
- * @param {AnyDate | null | undefined} anyDate
+ * @returns {string | undefined} the locale for the date
  */
 export function getDateLocale(anyDate) {
     if (!anyDate) return undefined;
@@ -108,7 +110,7 @@ toDateTime.tz = (anyDate, tz, locale) => toDateTime(anyDate, locale).toTimezone(
  * @param {boolean | undefined} options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
  * @returns {string}
  */
-export function __formatToDateOnly(anyDate, options = {}) {
+function __formatToDateOnly(anyDate, options = {}) {
     const {toISOForm = false, format, includeTimeAndZone = false} = options;
     if (toISOForm) {
         const dateOnly = toDateOnly(anyDate);
@@ -134,7 +136,7 @@ export function __formatToDateOnly(anyDate, options = {}) {
  * @param {boolean | undefined} options.toISOForm optional flag for forcing an ISOString output
  * @returns {string}
  */
-export function __formatToDateTime(anyDate, options) {
+function __formatToDateTime(anyDate, options) {
     const {toISOForm = false, format} = options;
     if (toISOForm) {
         return toDateTime(anyDate).toISOString(true);

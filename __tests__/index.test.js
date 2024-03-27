@@ -11,10 +11,9 @@ const {
     formatToDateOnlyWithLocale,
     formatToDateTimeWithLocale,
     LOCALE_FORMATS,
+    DateOnly,
+    DateTime,
 } = require('../index.cjs');
-const {DateOnly} = require('../date-only.cjs');
-const {DateTime} = require('../date-time.cjs');
-const {getLocalTimezone} = require('../utils/tz.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_US_LOCALE = 'en-US';

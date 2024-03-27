@@ -569,6 +569,11 @@ class DateTime {
         return 'Date';
     }
 
+    // For better debugging
+    [Symbol.for('nodejs.util.inspect.custom')]() {
+        return `DateTime(${this.toISOString(false)})`;
+    }
+
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
     getTime() {
         return this.toTimestamp();

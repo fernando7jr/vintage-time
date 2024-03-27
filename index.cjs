@@ -13,7 +13,7 @@ const {LOCALE_FORMATS} = require('./locale-formats.cjs');
  * Other libraries might do so but need to be handled in this code too.
  * If there is no locale then undefined is returned which also means the default locale `en` should be used instead.
  * @param {AnyDate | null | undefined} anyDate any possible date
- * @param {AnyDate | null | undefined} anyDate
+ * @returns {string | undefined} the locale for the date
  */
 function getDateLocale(anyDate) {
     if (!anyDate) return undefined;
@@ -42,7 +42,7 @@ function isDateValid(anyDate) {
  * @returns {Date | undefined}
  */
 function toJsDate(anyDate) {
-    if (!anyDate) return false;
+    if (!anyDate) return undefined;
     else if (anyDate instanceof Date) return anyDate;
     else if (isMoment(anyDate)) return anyDate.toDate();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.toJsDate();
@@ -198,6 +198,8 @@ function formatToDateTimeWithLocale(anyDate, options) {
 }
 
 module.exports = {
+    DateOnly,
+    DateTime,
     isDateValid,
     getDateLocale,
     LOCALE_FORMATS,

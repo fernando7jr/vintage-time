@@ -528,6 +528,11 @@ export class DateOnly {
         return 'Date';
     }
 
+    // For better debugging
+    [Symbol.for('nodejs.util.inspect.custom')]() {
+        return `DateOnly(${this.toJSON()})`;
+    }
+
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
     getTime() {
         return this.toTimestamp();

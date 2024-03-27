@@ -5,6 +5,8 @@ const {DATE_ONLY_REGEX} = require('./regex.cjs');
 const {__isDateTimeObject} = require('./utils/date-time.cjs');
 const {__isDateOnlyObject} = require('./utils/date-only.cjs');
 
+const customInspectSymbol = Symbol && Symbol.for('nodejs.util.inspect.custom');
+
 /**
  * @typedef {moment.Moment} Moment
  * @typedef {import('./date-time').DateTime} DateTime
@@ -526,6 +528,11 @@ class DateOnly {
     // MomentJs/Sequelize Compatibility layer
     get [Symbol.toStringTag]() {
         return 'Date';
+    }
+
+    // For better debugging
+    [Symbol.for('nodejs.util.inspect.custom')]() {
+        return `DateOnly(${this.toJSON()})`;
     }
 
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
