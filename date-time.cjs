@@ -8,12 +8,14 @@ const {getLocalTimezone} = require('./utils/tz.cjs');
 
 /**
  * @typedef {moment.Moment} Moment
+ * @typedef {moment.unitOfTime.Diff} DiffUnit
  * @typedef {moment.unitOfTime.StartOf} StartOfUnit
  * @typedef {StartOfUnit} EndOfUnit
  * @typedef {moment.unitOfTime.All} AddUnit
  * @typedef {AddUnit} SubtractUnit
- * @typedef {import('./date-time').DateTime} DateTime
+ * @typedef {import('./date-time').DateOnly} DateOnly
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
+ * @typedef {Record<AddUnit, number>} Duration
  */
 
 /**
@@ -79,7 +81,7 @@ class DateTime {
     }
 
     /**
-     * Construct a new date-only from a moment object value
+     * Construct a new date-time from a moment object value
      * @param {Moment} date any moment date
      * @param {string | undefined} locale optional locale if provided
      */
@@ -88,7 +90,7 @@ class DateTime {
     }
 
     /**
-     * Construct a new date-only from a plain js Date
+     * Construct a new date-time from a plain js Date
      * @param {Date} date any plain js Date
      * @param {string | undefined} locale optional locale if provided
      */
@@ -97,7 +99,7 @@ class DateTime {
     }
 
     /**
-     * Construct a new date-only from a DateTime isntance
+     * Construct a new date-time from a DateTime isntance
      * @param {DateTime} dateTime any date-time object
      * @param {string | undefined} locale optional locale if provided
      */
@@ -127,7 +129,7 @@ class DateTime {
     }
 
     /**
-     * Construct a new date-only from a DateOnly isntance
+     * Construct a new date-time from a DateOnly isntance
      * @param {DateOnly} dateOnly any date-only object
      * @param {string | undefined} locale optional locale if provided
      */
@@ -147,7 +149,7 @@ class DateTime {
     }
 
     /**
-     * Construct a new date-only from any valid date value
+     * Construct a new date-time from any valid date value
      * @param {AnyDate} dateOnly any valid date. Empty (null or undefined) or NaN will return an invalid date
      * @param {string | undefined} locale optional locale if provided
      */
@@ -380,22 +382,41 @@ class DateTime {
         this._innerDate = this._innerDate.milliseconds(value);
     }
 
+    /** 
+     * @returns {true} whether this date is at the UTC timezone or not
+     */
     get isUTC() {
         return this._innerDate.isUTC() || this.offset === 'UTC';
     }
 
+    /**
+     * Check if the date is valid.
+     * @returns {boolean} true if this is a valid date, false otherwise
+     */
     get isValid() {
         return this._innerDate.isValid();
     }
 
+    /**
+     * @returns {boolean} true if this date year is a leap year, false otherwise
+     */
     get isLeapYear() {
         return this._innerDate.isLeapYear();
     }
 
+    /**
+     * Move this DateTime to a different timezone. The new offset is applied.
+     * @param {string} timezone the new timezone
+     * @returns {DateTime} a new DateTime using the specified timezone
+     */
     toTimezone(timezone) {
         return DateTime.fromMomentDate(moment.tz(this._innerDate, timezone));
     }
 
+    /**
+     * Same as calling `toTimezone('UTC')`
+     * @returns {DateTime} a new DateTime using the UTC timezone
+     */
     toUTC() {
         return this.toTimezone('UTC');
     }
@@ -508,7 +529,7 @@ class DateTime {
     }
 
     /**
-     * Clone the DateOnly returning a new object with the same value
+     * Clone the DateTime returning a new object with the same value
      * @returns {DateTime}
      */
     clone() {
@@ -516,39 +537,76 @@ class DateTime {
     }
 
     /**
-     * @return {number} Unix timestamp in milliseconds
+     * Return the number of milliseconds since the Unix Epoch.
+     * Same as calling `new Date().getTime()`.
+     * @returns {number} the timestamp for this DateTime
      */
     valueOf() {
         return this._innerDate.valueOf();
     }
 
-    equals(date) {
-        const dateTime = DateTime.fromAnyDate(date);
+    /**
+     * Return true when the date value is equal to this date-time.
+     * This checks the value.
+     * @param {AnyDate} anyDate any date value
+     */
+    equals(anyDate) {
+        const dateTime = DateTime.fromAnyDate(anyDate);
         return this.valueOf() === dateTime.valueOf();
     }
 
+   /**
+     * Return a plain JS Date object based on this DateTime value.
+     * The Date object is going to be at the local timezone, so the date might be off by one day.
+     * Same as calling `new Date(this.toTimestamp())` or `new Date(this.toISOString())`.
+     * @returns {Date} an equivalent JS Date object for this DateTime value
+     */
     toJsDate() {
         return this._innerDate.toDate();
     }
 
+    /**
+     * Format this DateTime to a ISO String (`YYYY-MM-DDTHH:mm:ss.SSSZ`).
+     * @param useUtc optional parameter to enforce the output to be at the UTC timezone. Offset difference is applied. Defaults to false.
+     * @return {string} an ISO String for this DateTime. Either at UTC or at its own timezone
+     */
     toISOString(useUtc = false) {
         if (!this.isValid) return this._innerDate.toString();
         return this._innerDate.toISOString(!useUtc);
     }
 
+    /**
+     * Format this DateTime to `YYYY-MM-DDTHH:mm:ss.SSSZ`.
+     * Same as calling `this.toISOString(false)`.
+     * @return {string} an string in the DateTime format
+     */
     toJSON() {
         if (!this.isValid) return this._innerDate.toString();
-        return this._innerDate.toJSON();
+        return this._innerDate.toISOString();
     }
 
+    /**
+     * Format this DateTime to `YYYY-MM-DDTHH:mm:ss.SSSZ`.
+     * Same as calling `toJSON()`.
+     * @return {string} an string in the DateTime format
+     */
     toString() {
         return this.toISOString();
     }
 
+    /**
+     * Return the number of milliseconds since the Unix Epoch.
+     * Same as calling `new Date().getTime()`.
+     * @returns {number} the timestamp for this DateTime
+     */
     toTimestamp() {
         return this._innerDate.valueOf();
     }
 
+    /**
+     * Return an plain object containing only the fields `year`, `month`, `day`, `hour`, `minute`, `second`, `millisecond`, `timezone` and `offset` of this DateTime.
+     * @returns an plain JS object representing this DateTime.
+     */
     toObject() {
         const obj = this._innerDate.toObject();
         return {
@@ -571,7 +629,7 @@ class DateTime {
 
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
-        return `DateTime(${this.toISOString(false)})`;
+        return `DateTime(${this.toISOString(false).replace('T', ' ')})`;
     }
 
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */

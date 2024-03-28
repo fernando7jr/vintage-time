@@ -339,14 +339,25 @@ class DateOnly {
         this._innerDate = this._innerDate.quarter(value);
     }
 
+    /** 
+     * Always return true to a DateOnly object
+     * @returns {true} whether this date is at the UTC timezone or not
+     */
     get isUTC() {
         return true;
     }
 
+    /**
+     * Check if the date is valid.
+     * @returns {boolean} true if this is a valid date, false otherwise
+     */
     get isValid() {
         return this._innerDate.isValid();
     }
 
+    /**
+     * @returns {boolean} true if this date year is a leap year, false otherwise
+     */
     get isLeapYear() {
         return this._innerDate.isLeapYear();
     }
@@ -483,39 +494,72 @@ class DateOnly {
     }
 
     /**
+     * Get the valueOf the inner date value (timestamp).
+     * Same as calling `toTimestamp()` method.
      * @return {number} Unix timestamp in milliseconds
      */
     valueOf() {
-        return this._innerDate.valueOf();
+        return this.toTimestamp();
     }
 
-    equals(date) {
-        const dateOnly = DateOnly.fromAnyDate(date);
+    /**
+     * Return true when the date value is equal to this date-only.
+     * This checks the value.
+     * @param anyDate any date value
+     */
+    equals(anyDate) {
+        const dateOnly = DateOnly.fromAnyDate(anyDate);
         return this.valueOf() === dateOnly.valueOf();
     }
 
+    /**
+     * Return a plain JS Date object based on this DateOnly value.
+     * The Date object is going to be at the local timezone, so the date might be off by one day.
+     * @returns {Date} an equivalent JS Date object for this DateOnly value
+     */
     toJsDate() {
         return this._innerDate.toDate();
     }
 
+    /**
+     * Format this DateOnly to a ISO String (`YYYY-MM-DDT00:00:00.000Z`).
+     * Since this is a DateOnly, the time part is always on UTC and at `00:00:00.000`.
+     * @return {string} an ISO String for this DateOnly
+     */
     toISOString() {
         if (!this.isValid) return this._innerDate.toString();
         return `${this.toJSON()}T00:00:00.000Z`;
     }
 
+    /**
+     * Format this DateOnly to `YYYY-MM-DD`.
+     * @return {string} an string in the DateOnly format
+     */
     toJSON() {
         if (!this.isValid) return this._innerDate.toString();
         return this.format('YYYY-MM-DD');
     }
 
+    /**
+     * Same as calling the`toJSON()` method.
+     */
     toString() {
         return this.toJSON();
     }
 
+    /**
+     * Return the number of milliseconds since the Unix Epoch.
+     * Same as calling `new Date().getTime()`.
+     * @returns {number} the timestamp for this DateOnly
+     */
     toTimestamp() {
         return this._innerDate.startOf('day').valueOf();
     }
 
+    /**
+     * Return an plain object containing only the fields `year`, `month` and `day` of this DateOnly.
+     * @returns an plain JS object representing this DateOnly.
+     */
     toObject() {
         const obj = this._innerDate.toObject();
         return {
