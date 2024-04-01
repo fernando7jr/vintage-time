@@ -1,7 +1,6 @@
 import {DataTypes} from 'sequelize';
 
-import {DateOnly} from '../date-only.cts';
-import {DateTime} from '../date-time.cts';
+import {DateTime, DateOnly} from '../index.cts';
 
 /**
  * Get sequelize DATEONLY type properties
