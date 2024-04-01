@@ -13,7 +13,7 @@ const {getLocalTimezone} = require('./utils/tz.cjs');
  * @typedef {StartOfUnit} EndOfUnit
  * @typedef {moment.unitOfTime.All} AddUnit
  * @typedef {AddUnit} SubtractUnit
- * @typedef {import('./date-time').DateOnly} DateOnly
+ * @typedef {import('./date-time.cjs').DateOnly} DateOnly
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  * @typedef {Record<AddUnit, number>} Duration
  */
