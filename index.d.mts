@@ -6,12 +6,12 @@ export { LOCALE_FORMATS } from './locale-formats.mts';
 export type AnyDate = Date | Moment | DateOnly | DateTime | DateOnlyLike | DateTimeLike | string | number;
 
 export type DateOnlyLike = Pick<DateOnly, 'year' | 'month' | 'day'>;
-export type DiffUnit = unitOfTime.Diff
-export type DateOnlyStartOfUnit = 'year' | 'years' | 'y' | 'month' | 'months' | 'M' | 'week' | 'weeks' | 'w' | 'quarter' | 'quarters' | 'Q' | 'isoWeek' | 'isoWeeks' | 'W'
-export type DateOnlyEndOfUnit = DateOnlyStartOfUnit
-export type DateOnlyAddUnit = DateOnlyStartOfUnit | 'day' | 'days' | 'd' | 'D'
-export type DateOnlySubtractUnit = DateOnlyAddUnit
-export type DateOnlyDuration = Record<DateOnlyAddUnit, number>
+export type DiffUnit = unitOfTime.Diff;
+export type DateOnlyStartOfUnit = 'year' | 'years' | 'y' | 'month' | 'months' | 'M' | 'week' | 'weeks' | 'w' | 'quarter' | 'quarters' | 'Q' | 'isoWeek' | 'isoWeeks' | 'W' | 'day' | 'days' | 'd' | 'D';
+export type DateOnlyEndOfUnit = DateOnlyStartOfUnit;
+export type DateOnlyAddUnit = DateOnlyStartOfUnit;
+export type DateOnlySubtractUnit = DateOnlyAddUnit;
+export type DateOnlyDuration = Record<DateOnlyAddUnit, number>;
 
 export class DateOnly {
     /**
@@ -242,7 +242,7 @@ export class DateOnly {
      * console.log(c.format()); // '2023-04-03'
      * ```
      */
-    plus(duration: DateOnlyDuration): DateOnly;
+    plus(duration: Partial<DateOnlyDuration>): DateOnly;
     /**
      * Add a duration to this date and return a new DateOnly object with the resulting date
      * @param amount durtion object or numeric amount when used along an unit of time
@@ -282,7 +282,7 @@ export class DateOnly {
      * console.log(c.format()); // '2022-09-29'
      * ```
      */
-    minus(duration: DateOnlyDuration): DateOnly;
+    minus(duration: Partial<DateOnlyDuration>): DateOnly;
     /**
      * Subtract a duration to this date and return a new DateOnly object with the resulting date
      * @param amount durtion object or numeric amount when used along an unit of time
@@ -378,7 +378,7 @@ export type DateTimeStartOfUnit = unitOfTime.StartOf;
 export type DateTimeEndOfUnit = DateTimeStartOfUnit;
 export type DateTimeAddUnit = unitOfTime.All;
 export type DateTimeSubtractUnit = DateTimeAddUnit;
-export type DateTimeDuration = Record<DateTimeAddUnit, number>
+export type DateTimeDuration = Record<DateTimeAddUnit, number>;
 
 export class DateTime {
     /**
@@ -665,7 +665,7 @@ export class DateTime {
      * console.log(c.format()); // '2023-04-03'
      * ```
      */
-    plus(duration: DateTimeDuration): DateTime;
+    plus(duration: Partial<DateTimeDuration>): DateTime;
     /**
      * Add a duration to this date and return a new DateTime object with the resulting date
      * @param amount durtion object or numeric amount when used along an unit of time
@@ -706,7 +706,7 @@ export class DateTime {
      * console.log(c.format()); // '2022-09-29'
      * ```
      */
-    minus(duration: DateTimeDuration): DateTime;
+    minus(duration: Partial<DateTimeDuration>): DateTime;
     /**
      * Subtract a duration to this date and return a new DateTime object with the resulting date
      * @param amount durtion object or numeric amount when used along an unit of time
