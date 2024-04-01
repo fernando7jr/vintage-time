@@ -9,7 +9,7 @@ const customInspectSymbol = Symbol && Symbol.for('nodejs.util.inspect.custom');
 
 /**
  * @typedef {moment.Moment} Moment
- * @typedef {import('./date-time').DateTime} DateTime
+ * @typedef {import('./date-time.cjs').DateTime} DateTime
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  */
 /**

@@ -13,7 +13,7 @@ import {getLocalTimezone} from './utils/tz.cjs';
  * @typedef {StartOfUnit} EndOfUnit
  * @typedef {moment.unitOfTime.All} AddUnit
  * @typedef {AddUnit} SubtractUnit
- * @typedef {import('./date-time').DateOnly} DateOnly
+ * @typedef {import('./date-time.mjs').DateOnly} DateOnly
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  * @typedef {Record<AddUnit, number>} Duration
  */
