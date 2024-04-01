@@ -2,7 +2,7 @@ const moment = require('moment-timezone');
 
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
-const {toDateOnly, toDateTime, isDateValid} = require('../index.cjs');
+const {toDateOnly, toDateTime, isDateValid,} = require('../index.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_LOCALE = 'en';
@@ -46,6 +46,296 @@ describe('DateOnly', () => {
                 ];
                 const result = cases.map((c) => DateOnly.isDateOnly(c));
                 expect(result).toEqual(result.map(() => false));
+            });
+        });
+
+        describe('isEqual', () => {
+            const datesA = [
+                DateOnly.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01T23:59:59.999Z'),
+                '2023-01-01',
+                '2023-01-01T23:59:59.999Z',
+            ];
+            const datesB = [
+                DateOnly.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02T23:59:59.999Z'),
+                '2023-01-02',
+                '2023-01-02T23:59:59.999Z',
+            ];
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const compareFn = (a, b) => DateOnly.isEqual(a, b);
+
+            it('should return true when both dates have the same value', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesA) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+                for (const dateA of datesB) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+            });
+
+            it('should return false when the dates are different', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                    }
+                }
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of invalidDates) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+        });
+
+        describe('isEqualOrBefore', () => {
+            const datesA = [
+                DateOnly.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01T23:59:59.999Z'),
+                '2023-01-01',
+                '2023-01-01T23:59:59.999Z',
+            ];
+            const datesB = [
+                DateOnly.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02T23:59:59.999Z'),
+                '2023-01-02',
+                '2023-01-02T23:59:59.999Z',
+            ];
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const compareFn = (a, b) => DateOnly.isEqualOrBefore(a, b);
+
+            it('should return true when the first date is equal or before the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesA) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+                for (const dateA of datesB) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+            });
+
+            it('should return false when the first date is not equal or before the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                    }
+                }
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of invalidDates) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+        });
+
+        describe('isEqualOrAfter', () => {
+            const datesB = [
+                DateOnly.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01T23:59:59.999Z'),
+                '2023-01-01',
+                '2023-01-01T23:59:59.999Z',
+            ];
+            const datesA = [
+                DateOnly.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02T23:59:59.999Z'),
+                '2023-01-02',
+                '2023-01-02T23:59:59.999Z',
+            ];
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const compareFn = (a, b) => DateOnly.isEqualOrAfter(a, b);
+
+            it('should return true when the first date is equal or after the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesA) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+                for (const dateA of datesB) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+            });
+
+            it('should return false when the first date is not equal or after the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                    }
+                }
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of invalidDates) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+        });
+
+        describe('isBefore', () => {
+            const datesA = [
+                DateOnly.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01T23:59:59.999Z'),
+                '2023-01-01',
+                '2023-01-01T23:59:59.999Z',
+            ];
+            const datesB = [
+                DateOnly.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02T23:59:59.999Z'),
+                '2023-01-02',
+                '2023-01-02T23:59:59.999Z',
+            ];
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const compareFn = (a, b) => DateOnly.isBefore(a, b);
+
+            it('should return true when the first date is before the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+            });
+
+            it('should return false when the first date is not before the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateA, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of invalidDates) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+        });
+
+        describe('isAfter', () => {
+            const datesB = [
+                DateOnly.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01'),
+                DateTime.fromAnyDate('2023-01-01T23:59:59.999Z'),
+                '2023-01-01',
+                '2023-01-01T23:59:59.999Z',
+            ];
+            const datesA = [
+                DateOnly.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02'),
+                DateTime.fromAnyDate('2023-01-02T23:59:59.999Z'),
+                '2023-01-02',
+                '2023-01-02T23:59:59.999Z',
+            ];
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const compareFn = (a, b) => DateOnly.isAfter(a, b);
+
+            it('should return true when the first date is after the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateB)).toBe(true);
+                    }
+                }
+            });
+
+            it('should return false when the first date is not after the second date', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of datesB) {
+                        expect(compareFn(dateA, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const dateA of datesA) {
+                    for (const dateB of invalidDates) {
+                        expect(compareFn(dateA, dateB)).toBe(false);
+                        expect(compareFn(dateB, dateA)).toBe(false);
+                        expect(compareFn(dateB, dateB)).toBe(false);
+                    }
+                }
             });
         });
 

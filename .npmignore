@@ -1,3 +1,4 @@
+.github
 .prettierignore
 *.test.js
 *.test.mjs

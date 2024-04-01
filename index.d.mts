@@ -22,6 +22,51 @@ export class DateOnly {
     static isDateOnly(value: any): value is DateOnly;
 
     /**
+     * Compare two dates and return true if the first date has the same value as the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date equals the seocond date
+     */
+    static isEqual(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is before the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is before the second date
+     */
+    static isBefore(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is after the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is after the second date
+     */
+    static isAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is before or equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is before or equal the second date
+     */
+    static isEqualOrBefore(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is after ir equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is after or equal the second date
+     */
+    static isEqualOrAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
      * Get a new date-only using the current system time for its value
      * @param locale optional locale if provided
      * @returns a new date-only using the current system time for its value
@@ -387,6 +432,51 @@ export class DateTime {
      * @returns true if value is DateTime, false otherwise
      */
     static isDateTime(value: any): value is DateTime;
+
+    /**
+     * Compare two dates and return true if the first date has the same value as the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date equals the seocond date
+     */
+    static isEqual(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is before the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is before the second date
+     */
+    static isBefore(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is after the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is after the second date
+     */
+    static isAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is before or equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is before or equal the second date
+     */
+    static isEqualOrBefore(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare two dates and return true if the first date is after ir equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @param compareDate any date value to be compared
+     * @returns true if the first date is after or equal the second date
+     */
+    static isEqualOrAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
 
     /**
      * Get a new date-time using the current system time for its value
