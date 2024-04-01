@@ -5,6 +5,9 @@
     "type": "commonjs",
     "main": "index.cjs",
     "module": "index.mjs",
+    "engines": {
+        "node": ">=18.0.0"
+    },
     "exports": {
         ".": {
             "require": "./index.cjs",
