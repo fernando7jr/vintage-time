@@ -1,5 +1,8 @@
 # vintage-time
 
+[![npm version](https://badge.fury.io/js/vintage-time.svg)](https://badge.fury.io/js/vintage-time)[![codecov](https://codecov.io/gh/fernando7jr/vintage-time/graph/badge.svg?token=OPIEI5SPCJ)](https://codecov.io/gh/fernando7jr/vintage-time)![example workflow](https://github.com/fernando7jr/vintage-time/actions/workflows/node.js.yml/badge.svg)[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+
+
 DateTime x DateOnly library with locale support. Compatible with sequelize, joi, momentjs and plain javascript Dates
 
 Distributed through the [npm packge vintage-time](https://www.npmjs.com/vintage-time)
