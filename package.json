@@ -55,8 +55,8 @@
         "sqlite3": "^5.1.7"
     },
     "peerDependencies": {
-        "joi": "^17.12.0",
-        "sequelize": "^6.37.1"
+        "joi": "^17.x",
+        "sequelize": "^6.25"
     },
     "dependencies": {
         "moment-timezone": "^0.5.45"
