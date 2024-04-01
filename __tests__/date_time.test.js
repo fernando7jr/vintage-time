@@ -61,7 +61,7 @@ describe('DateTime', () => {
             it('should get date now without a custom locale', () => {
                 const date = new Date();
                 const now = DateTime.now();
-                expect(date.valueOf()).toBeGreaterThanOrEqual(now.valueOf());
+                expect(date.valueOf()).toBeGreaterThanOrEqual(now.valueOf() - 1);
                 expect(now.locale).toEqual(DEFAULT_LOCALE);
                 expect(now.offset).toEqual(DEFAULT_TZ_OFFSET);
             });

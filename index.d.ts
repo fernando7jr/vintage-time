@@ -1,6 +1,7 @@
 import type {Moment, unitOfTime} from 'moment-timezone';
 
-import { LOCALE_FORMATS } from './locale-formats.ts';
+import { LOCALE_FORMATS } from './locale-formats.cts';
+export { LOCALE_FORMATS } from './locale-formats.cts';
 
 export type AnyDate = Date | Moment | DateOnly | DateTime | DateOnlyLike | DateTimeLike | string | number;
 
