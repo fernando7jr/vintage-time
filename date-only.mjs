@@ -7,7 +7,7 @@ import {__isDateOnlyObject} from './utils/date-only.mjs';
 
 /**
  * @typedef {moment.Moment} Moment
- * @typedef {import('./date-time').DateTime} DateTime
+ * @typedef {import('./date-time.mjs').DateTime} DateTime
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  */
 /**
