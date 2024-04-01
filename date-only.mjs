@@ -79,6 +79,90 @@ export class DateOnly {
     }
 
     /**
+     * Check if the value is DateOnly instance
+     * @param {*} value
+     * @returns {value is DateOnly}
+     */
+    static isDateOnly(value) {
+        return Boolean(value instanceof DateOnly || value?.isDateOnly);
+    }
+
+    /**
+     * Compare two dates and return true if the first date has the same value as the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param {AnyDate} date any date value to be compared
+     * @param {AnyDate} compareDate any date value to be compared
+     * @returns {boolean} true if the first date equals the seocond date
+     */
+    static isEqual(date, compareDate) {
+        const a = this.fromAnyDate(date);
+        if (!a.isValid) return false;
+        const b = this.fromAnyDate(compareDate);
+        if (!b.isValid) return false;
+        return a.equals(b);
+    }
+
+    /**
+     * Compare two dates and return true if the first date is before the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param {AnyDate} date any date value to be compared
+     * @param {AnyDate} compareDate any date value to be compared
+     * @returns {boolean} true if the first date is before the second date
+     */
+    static isBefore(date, compareDate) {
+        const a = this.fromAnyDate(date);
+        if (!a.isValid) return false;
+        const b = this.fromAnyDate(compareDate);
+        if (!b.isValid) return false;
+        return a < b;
+    }
+
+    /**
+     * Compare two dates and return true if the first date is after the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param {AnyDate} date any date value to be compared
+     * @param {AnyDate} compareDate any date value to be compared
+     * @returns {boolean} true if the first date is after the second date
+     */
+    static isAfter(date, compareDate) {
+        const a = this.fromAnyDate(date);
+        if (!a.isValid) return false;
+        const b = this.fromAnyDate(compareDate);
+        if (!b.isValid) return false;
+        return a > b;
+    }
+
+    /**
+     * Compare two dates and return true if the first date is before or equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param {AnyDate} date any date value to be compared
+     * @param {AnyDate} compareDate any date value to be compared
+     * @returns {boolean} true if the first date is before or equal the second date
+     */
+    static isEqualOrBefore(date, compareDate) {
+        const a = this.fromAnyDate(date);
+        if (!a.isValid) return false;
+        const b = this.fromAnyDate(compareDate);
+        if (!b.isValid) return false;
+        return a <= b;
+    }
+
+    /**
+     * Compare two dates and return true if the first date is after ir equal the second date.
+     * If any of the dates is invalid then this method will return false.
+     * @param {AnyDate} date any date value to be compared
+     * @param {AnyDate} compareDate any date value to be compared
+     * @returns {boolean} true if the first date is after or equal the second date
+     */
+    static isEqualOrAfter(date, compareDate) {
+        const a = this.fromAnyDate(date);
+        if (!a.isValid) return false;
+        const b = this.fromAnyDate(compareDate);
+        if (!b.isValid) return false;
+        return a >= b;
+    }
+
+    /**
      * Get a new date-only using the current system time for its value
      * @param {string | undefined} locale optional locale if provided
      * @returns {DateOnly} a new date-only using the current system time for its value
