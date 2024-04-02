@@ -5,8 +5,6 @@ const {DATE_ONLY_REGEX} = require('./regex.cjs');
 const {__isDateTimeObject} = require('./utils/date-time.cjs');
 const {__isDateOnlyObject} = require('./utils/date-only.cjs');
 
-const customInspectSymbol = Symbol && Symbol.for('nodejs.util.inspect.custom');
-
 /**
  * @typedef {moment.Moment} Moment
  * @typedef {import('./date-time.cjs').DateTime} DateTime
@@ -61,9 +59,7 @@ function __getObjectValue(value) {
         case 'function':
             return value();
         default:
-            throw new Error(
-                `Unsuppo/Users/fernando/projs/deel/backend/utils/date/locale-formats.js /Users/fernando/projs/deel/backend/utils/date/regex.js /Users/fernando/projs/deel/backend/utils/date/sequelize.jsrted value type "${_type}" for DateTime obejct notation`
-            );
+            throw new Error(`Unsupported value type "${_type}" for DateOnly obejct notation`);
     }
 }
 

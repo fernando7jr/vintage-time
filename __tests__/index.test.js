@@ -50,9 +50,9 @@ describe('Date & Locale utils', () => {
             expect(result.locale).toBe(CUSTOM_LOCALE);
         });
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: toDateTime(s).toTimestamp()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: toDateTime(s).toTimestamp() })))(
             'should convert timestamp value $timestampValue to date-only',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const result = toDateOnly(timestampValue);
                 expect(result).toBeDefined();
                 expect(result.isDateOnly).toBe(true);
@@ -62,9 +62,9 @@ describe('Date & Locale utils', () => {
             }
         );
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: new Date(moment.utc(s)).getTime()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: new Date(moment.utc(s)).getTime() })))(
             'should convert timestamp value $timestampValue to date-only with custom locale',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const result = toDateOnly(timestampValue, CUSTOM_LOCALE);
                 expect(result).toBeDefined();
                 expect(result.isDateOnly).toBe(true);
@@ -209,9 +209,9 @@ describe('Date & Locale utils', () => {
             expect(result.locale).toBe(CUSTOM_LOCALE);
         });
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: moment.utc(s).valueOf()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: moment.utc(s).valueOf() })))(
             'should convert timestamp value $timestampValue to date-time',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const result = toDateTime(timestampValue);
                 expect(result).toBeDefined();
                 expect(result.isDateTime).toBe(true);
@@ -221,9 +221,9 @@ describe('Date & Locale utils', () => {
             }
         );
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: moment.utc(s).valueOf()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: moment.utc(s).valueOf() })))(
             'should convert timestamp value $timestampValue to date-time with custom locale',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const result = toDateTime(timestampValue, CUSTOM_LOCALE);
                 expect(result).toBeDefined();
                 expect(result.isDateTime).toBe(true);
@@ -331,6 +331,20 @@ describe('Date & Locale utils', () => {
             expect(result.toString()).not.toBe('Invalid date');
             expect(result.locale).toBe(CUSTOM_LOCALE);
         });
+
+        it('should have a sub-method tz', () => {
+            let result = toDateTime.tz('2000-07-09T22:33:44.222+03:00', 'UTC');
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toString()).toBe('2000-07-09T19:33:44.222Z');
+            expect(result.locale).toBe(DEFAULT_LOCALE);
+
+            result = toDateTime.tz('2000-07-09T22:33:44.222+03:00', 'UTC', CUSTOM_LOCALE);
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toString()).toBe('2000-07-09T19:33:44.222Z');
+            expect(result.locale).toBe(CUSTOM_LOCALE);
+        });
     });
 
     describe('toJsDate', () => {
@@ -360,9 +374,9 @@ describe('Date & Locale utils', () => {
             expect(result.toISOString()).toEqual(getExpectedStringValue(stringValue));
         });
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: moment.utc(s).valueOf()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: moment.utc(s).valueOf() })))(
             'should convert timestamp value $timestampValue to JS date',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const result = toJsDate(stringValue);
                 expect(result).toBeInstanceOf(Date);
                 expect(result.toISOString(true)).toEqual(getExpectedStringValue(stringValue));
@@ -399,8 +413,9 @@ describe('Date & Locale utils', () => {
             expect(result.toISOString()).toEqual(getExpectedStringValue(stringValue));
         });
 
-        it('should handle null and undefined values', () => {
-            expect([toDateTime(null), toDateTime(undefined)]).toEqual([undefined, undefined]);
+        it('should handle null and undefined values and other falsy values', () => {
+            const values = [null, undefined, '', false, 0];
+            expect(values.map((v) => toJsDate(v))).toEqual(values.map(() => undefined));
         });
     });
 
@@ -455,7 +470,7 @@ describe('Date & Locale utils', () => {
         });
 
         it('should return undefined', () => {
-            expect([getDateLocale(null), getDateLocale(undefined), getDateLocale(new Date())]).toEqual([
+            expect([getDateLocale(null), getDateLocale(undefined), getDateLocale(new Date()), getDateLocale(true)]).toEqual([
                 undefined,
                 undefined,
                 undefined,
@@ -479,28 +494,28 @@ describe('Date & Locale utils', () => {
         it.each(cases)('should format string value %s to YYYY-MM-DD', (stringValue) => {
             const slicedStringValue = extractYYYYMMDDString(stringValue);
             expect(formatToDateOnly(stringValue)).toEqual(slicedStringValue);
-            expect(formatToDateOnly(stringValue, {includeTimeAndZone: false})).toEqual(slicedStringValue);
+            expect(formatToDateOnly(stringValue, { includeTimeAndZone: false })).toEqual(slicedStringValue);
         });
 
         it.each(cases)('should format string value %s to ISODate', (stringValue) => {
             const slicedStringValue = extractYYYYMMDDString(stringValue);
-            expect(formatToDateOnly(stringValue, {includeTimeAndZone: true})).toBe(toISODate(slicedStringValue));
+            expect(formatToDateOnly(stringValue, { includeTimeAndZone: true })).toBe(toISODate(slicedStringValue));
         });
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: toDateOnly(s).toTimestamp()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: toDateOnly(s).toTimestamp() })))(
             'should format timestamp value $timestampValue to YYYY-MM-DD',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const slicedStringValue = extractYYYYMMDDString(stringValue);
                 expect(formatToDateOnly(timestampValue)).toEqual(slicedStringValue);
-                expect(formatToDateOnly(timestampValue, {includeTimeAndZone: false})).toEqual(slicedStringValue);
+                expect(formatToDateOnly(timestampValue, { includeTimeAndZone: false })).toEqual(slicedStringValue);
             }
         );
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: toDateOnly(s).toTimestamp()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: toDateOnly(s).toTimestamp() })))(
             'should format timestamp value $timestampValue to ISODate',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 const slicedStringValue = extractYYYYMMDDString(stringValue);
-                expect(formatToDateOnly(timestampValue, {includeTimeAndZone: true})).toEqual(
+                expect(formatToDateOnly(timestampValue, { includeTimeAndZone: true })).toEqual(
                     toISODate(slicedStringValue)
                 );
             }
@@ -510,39 +525,43 @@ describe('Date & Locale utils', () => {
             const dateValue = new Date(stringValue);
             const expectedStringValue = extractYYYYMMDDString(toISOStringLocalTZ(stringValue));
             expect(formatToDateOnly(dateValue)).toEqual(expectedStringValue);
-            expect(formatToDateOnly(dateValue, {includeTimeAndZone: false})).toEqual(expectedStringValue);
+            expect(formatToDateOnly(dateValue, { includeTimeAndZone: false })).toEqual(expectedStringValue);
         });
 
         it.each(cases)('should format Date value %s to ISODate', (stringValue) => {
             const dateValue = new Date(stringValue);
             const expectedStringValue = extractYYYYMMDDString(toISOStringLocalTZ(stringValue));
-            expect(formatToDateOnly(dateValue, {includeTimeAndZone: true})).toEqual(toISODate(expectedStringValue));
+            expect(formatToDateOnly(dateValue, { includeTimeAndZone: true })).toEqual(toISODate(expectedStringValue));
         });
 
         it.each(cases)('should format DateOnly value %s to YYYY-MM-DD', (stringValue) => {
             const dateOnlyValue = toDateOnly(stringValue);
             const slicedStringValue = extractYYYYMMDDString(stringValue);
             expect(formatToDateOnly(dateOnlyValue)).toEqual(slicedStringValue);
-            expect(formatToDateOnly(dateOnlyValue, {includeTimeAndZone: false})).toEqual(slicedStringValue);
+            expect(formatToDateOnly(dateOnlyValue, { includeTimeAndZone: false })).toEqual(slicedStringValue);
         });
 
         it.each(cases)('should format DateOnly value %s to ISODate', (stringValue) => {
             const dateOnlyValue = toDateOnly(stringValue);
             const slicedStringValue = extractYYYYMMDDString(stringValue);
-            expect(formatToDateOnly(dateOnlyValue, {includeTimeAndZone: true})).toEqual(toISODate(slicedStringValue));
+            expect(formatToDateOnly(dateOnlyValue, { includeTimeAndZone: true })).toEqual(toISODate(slicedStringValue));
         });
 
         it.each(cases)('should format DateTime value %s to YYYY-MM-DD', (stringValue) => {
             const dateTimeValue = toDateTime(stringValue);
             const slicedStringValue = extractYYYYMMDDString(stringValue);
             expect(formatToDateOnly(dateTimeValue)).toEqual(slicedStringValue);
-            expect(formatToDateOnly(dateTimeValue, {includeTimeAndZone: false})).toEqual(slicedStringValue);
+            expect(formatToDateOnly(dateTimeValue, { includeTimeAndZone: false })).toEqual(slicedStringValue);
         });
 
         it.each(cases)('should format DateTime value %s to ISODate', (stringValue) => {
             const dateTimeValue = toDateTime(stringValue);
             const slicedStringValue = extractYYYYMMDDString(stringValue);
-            expect(formatToDateOnly(dateTimeValue, {includeTimeAndZone: true})).toEqual(toISODate(slicedStringValue));
+            expect(formatToDateOnly(dateTimeValue, { includeTimeAndZone: true })).toEqual(toISODate(slicedStringValue));
+        });
+
+        it('should return undefined when the date value is null or undefined', () => {
+            expect([formatToDateOnly(undefined), formatToDateOnly(null)]).toEqual([undefined, undefined])
         });
     });
 
@@ -572,9 +591,9 @@ describe('Date & Locale utils', () => {
             expect(formatToDateTime(stringValue)).toEqual(getExpectedStringValue(stringValue));
         });
 
-        it.each(cases.map((s) => ({stringValue: s, timestampValue: toDateTime(s).toTimestamp()})))(
+        it.each(cases.map((s) => ({ stringValue: s, timestampValue: toDateTime(s).toTimestamp() })))(
             'should format timestamp value $timestampValue to ISODate',
-            ({stringValue, timestampValue}) => {
+            ({ stringValue, timestampValue }) => {
                 expect(formatToDateTime(timestampValue)).toEqual(getExpectedStringValue(stringValue));
             }
         );
@@ -592,6 +611,10 @@ describe('Date & Locale utils', () => {
         it.each(cases)('should format DateTime value %s to ISODate', (stringValue) => {
             const dateTimeValue = toDateTime(stringValue);
             expect(formatToDateTime(dateTimeValue)).toEqual(getExpectedStringValue(stringValue));
+        });
+
+        it('should return undefined when the date value is null or undefined', () => {
+            expect([formatToDateOnly(undefined), formatToDateOnly(null)]).toEqual([undefined, undefined])
         });
     });
 
@@ -778,12 +801,12 @@ describe('Date & Locale utils', () => {
             },
         };
         const formatAll = (anyDate, locale) => ({
-            timeOnly: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.TIME_ONLY}),
-            timeWithSeconds: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.TIME_WITH_SECONDS}),
-            numeralDateShort: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.NUMERAL_DATE_SHORT}),
-            numeralDateLong: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.NUMERAL_DATE_LONG}),
-            verbalDateShort: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.VERBAL_DATE_SHORT}),
-            verbalDateLong: formatToDateOnlyWithLocale(anyDate, {locale, format: LOCALE_FORMATS.VERBAL_DATE_LONG}),
+            timeOnly: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.TIME_ONLY }),
+            timeWithSeconds: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.TIME_WITH_SECONDS }),
+            numeralDateShort: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.NUMERAL_DATE_SHORT }),
+            numeralDateLong: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.NUMERAL_DATE_LONG }),
+            verbalDateShort: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.VERBAL_DATE_SHORT }),
+            verbalDateLong: formatToDateOnlyWithLocale(anyDate, { locale, format: LOCALE_FORMATS.VERBAL_DATE_LONG }),
             verbalDateTimeShort: formatToDateOnlyWithLocale(anyDate, {
                 locale,
                 format: LOCALE_FORMATS.VERBAL_DATE_TIME_SHORT,
@@ -808,6 +831,16 @@ describe('Date & Locale utils', () => {
 
             const customResults = formatAll(stringValue, CUSTOM_LOCALE);
             expect(customResults).toEqual(formattedDateCustomLocaleByCase[stringValue]);
+        });
+
+        it('should throw on invalid type for locale', () => {
+            try {
+                formatToDateOnlyWithLocale('2000-02-04T22:33:44', {locale: 1000});
+                throw new Error('Should thrown an error');
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('Locale must be an string');
+            }
         });
     });
 
@@ -994,12 +1027,12 @@ describe('Date & Locale utils', () => {
             },
         };
         const formatAll = (anyDate, locale) => ({
-            timeOnly: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.TIME_ONLY}),
-            timeWithSeconds: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.TIME_WITH_SECONDS}),
-            numeralDateShort: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.NUMERAL_DATE_SHORT}),
-            numeralDateLong: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.NUMERAL_DATE_LONG}),
-            verbalDateShort: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.VERBAL_DATE_SHORT}),
-            verbalDateLong: formatToDateTimeWithLocale(anyDate, {locale, format: LOCALE_FORMATS.VERBAL_DATE_LONG}),
+            timeOnly: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.TIME_ONLY }),
+            timeWithSeconds: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.TIME_WITH_SECONDS }),
+            numeralDateShort: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.NUMERAL_DATE_SHORT }),
+            numeralDateLong: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.NUMERAL_DATE_LONG }),
+            verbalDateShort: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.VERBAL_DATE_SHORT }),
+            verbalDateLong: formatToDateTimeWithLocale(anyDate, { locale, format: LOCALE_FORMATS.VERBAL_DATE_LONG }),
             verbalDateTimeShort: formatToDateTimeWithLocale(anyDate, {
                 locale,
                 format: LOCALE_FORMATS.VERBAL_DATE_TIME_SHORT,
@@ -1024,6 +1057,16 @@ describe('Date & Locale utils', () => {
 
             const customResults = formatAll(stringValue, CUSTOM_LOCALE);
             expect(customResults).toEqual(formattedDateCustomLocaleByCase[stringValue]);
+        });
+
+        it('should throw on invalid type for locale', () => {
+            try {
+                formatToDateTimeWithLocale('2000-02-04T22:33:44', {locale: 1000});
+                throw new Error('Should thrown an error');
+            } catch (error) {
+                expect(error).toBeInstanceOf(Error);
+                expect(error.message).toBe('Locale must be an string');
+            }
         });
     });
 });

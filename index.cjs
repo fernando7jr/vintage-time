@@ -105,9 +105,10 @@ toDateTime.tz = (anyDate, tz, locale) => toDateTime(anyDate, locale).toTimezone(
  * @param {string | undefined} options.format optional format string pattern. Defaults to DateOnly `LL` which translates to `YYYY-MM-DD` at the specific locale
  * @param {boolean | undefined} options.toISOForm optional flag for forcing an ISOString output. Since it is a date-only the format string pattern will be `YYYY-MM-DD`
  * @param {boolean | undefined} options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
- * @returns {string}
+ * @returns {string | undefined}
  */
 function __formatToDateOnly(anyDate, options = {}) {
+    if (!anyDate) return undefined;
     const {toISOForm = false, format, includeTimeAndZone = false} = options;
     if (toISOForm) {
         const dateOnly = toDateOnly(anyDate);
@@ -119,7 +120,7 @@ function __formatToDateOnly(anyDate, options = {}) {
         if (!shouldApplyLocale) return undefined;
         const {locale} = options;
         if (typeof locale === 'string') return locale;
-        return undefined;
+        throw new Error('Locale must be an string');
     })();
     const dateOnly = toDateOnly(anyDate, locale);
     return dateOnly.format(format);
@@ -131,9 +132,10 @@ function __formatToDateOnly(anyDate, options = {}) {
  * @param {string | boolean | undefined} options.locale optional locale string or boolean for whether locale should be applied or not
  * @param {string | undefined} options.format optional format string pattern. Defaults to DateTime default format
  * @param {boolean | undefined} options.toISOForm optional flag for forcing an ISOString output
- * @returns {string}
+ * @returns {string | undefined}
  */
 function __formatToDateTime(anyDate, options) {
+    if (!anyDate) return undefined;
     const {toISOForm = false, format} = options;
     if (toISOForm) {
         return toDateTime(anyDate).toISOString(true);
@@ -144,7 +146,7 @@ function __formatToDateTime(anyDate, options) {
         if (!shouldApplyLocale) return undefined;
         const {locale} = options;
         if (typeof locale === 'string') return locale;
-        return undefined;
+        throw new Error('Locale must be an string');
     })();
     const dateTime = toDateTime(anyDate, locale);
     return dateTime.format(format);
@@ -155,7 +157,7 @@ function __formatToDateTime(anyDate, options) {
  * @param {AnyDate | null | undefined} anyDate any possible date
  * @param {object} options optional formating options to customize the output
  * @param {boolean | undefined} options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
- * @returns {string}
+ * @returns {string | undefined}
  */
 function formatToDateOnly(anyDate, options) {
     const {includeTimeAndZone = false} = options || {};
@@ -165,7 +167,7 @@ function formatToDateOnly(anyDate, options) {
 /**
  * Format a date to a date-time format but without applying locale
  * @param {AnyDate | null | undefined} anyDate any possible date
- * @returns {string}
+ * @returns {string | undefined}
  */
 function formatToDateTime(anyDate) {
     return __formatToDateTime(anyDate, {locale: false, toISOForm: true});
@@ -177,7 +179,7 @@ function formatToDateTime(anyDate) {
  * @param {object} options optional formating options to customize the output
  * @param {string | undefined} options.locale optional locale string. Defaults to the current locale set to the date or the default system locale
  * @param {string | undefined} options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_LONG`. @see `LOCALE_FORMATS`
- * @returns {string}
+ * @returns {string | undefined}
  */
 function formatToDateOnlyWithLocale(anyDate, options) {
     const {locale, format} = options || {};
@@ -190,7 +192,7 @@ function formatToDateOnlyWithLocale(anyDate, options) {
  * @param {object} options optional formating options to customize the output
  * @param {string | undefined} options.locale optional locale string. Defaults to the current locale set to the date or the default system locale
  * @param {string | undefined} options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`. @see `LOCALE_FORMATS`
- * @returns {string}
+ * @returns {string | undefined}
  */
 function formatToDateTimeWithLocale(anyDate, options) {
     const {locale, format} = options || {};

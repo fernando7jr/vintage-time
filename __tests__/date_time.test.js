@@ -844,6 +844,46 @@ describe('DateTime', () => {
                 ];
                 expect(result.map(isDateValid)).toEqual([false, false]);
             });
+
+            it('should handle weird DateTime object', () => {
+                const result = DateTime.fromDateTime({
+                    year: () => 2020,
+                    month: '02',
+                    day: 1,
+                    tz: UTC_TZ,
+                });
+                expect(result).toBeInstanceOf(DateTime);
+                expect(result.isDateTime).toBe(true);
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                    hour: 0,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
+                });
+                expect(result.toJSON()).toBe('2020-02-01T00:00:00.000Z');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+                expect(result.timezone).toBe('UTC');
+            });
+
+            it('should thrown on unexpected DateTime object', () => {
+                try {
+                    DateTime.fromDateTime({
+                        year: {value: 2022},
+                        month: '02',
+                        day: 1,
+                        tz: UTC_TZ,
+                    });
+                    throw new Error('Should thrown an error');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(Error);
+                    expect(error.message).toBe('Unsupported value type "object" for DateTime obejct notation');
+                }
+            });
         });
 
         describe('fromDateOnly', () => {
@@ -950,6 +990,31 @@ describe('DateTime', () => {
                     DateTime.fromDateOnly(DateOnly.invalid(), CUSTOM_LOCALE),
                 ];
                 expect(result.map(isDateValid)).toEqual([false, false]);
+            });
+
+            it('should handle malformed DateOnly object', () => {
+                const result = DateTime.fromDateOnly({
+                    isDateTime: true,
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                });
+                expect(result).toBeInstanceOf(DateTime);
+                expect(result.isDateTime).toBe(true);
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                    hour: 0,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
+                });
+                expect(result.toJSON()).toBe('2020-02-01T00:00:00.000Z');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+                expect(result.timezone).toBe('UTC');
             });
         });
 

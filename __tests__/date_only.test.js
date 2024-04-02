@@ -611,6 +611,37 @@ describe('DateOnly', () => {
                 ];
                 expect(result.map(isDateValid)).toEqual([false, false]);
             });
+
+            it('should handle weird DateOnly object', () => {
+                const result = DateOnly.fromDateOnly({
+                    year: () => 2020,
+                    month: '02',
+                    day: 1,
+                });
+                expect(result).toBeInstanceOf(DateOnly);
+                expect(result.isDateOnly).toBe(true);
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                });
+                expect(result.toJSON()).toBe('2020-02-01');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+            });
+
+            it('should thrown on unexpected DateOnly object', () => {
+                try {
+                    DateOnly.fromDateOnly({
+                        year: {value: 2022},
+                        month: '02',
+                        day: 1,
+                    });
+                    throw new Error('Should thrown an error');
+                } catch (error) {
+                    expect(error).toBeInstanceOf(Error);
+                    expect(error.message).toBe('Unsupported value type "object" for DateOnly obejct notation');
+                }
+            });
         });
 
         describe('fromAnyDate', () => {

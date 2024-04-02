@@ -912,11 +912,26 @@ export function isDateValid(anyDate: AnyDate | null | undefined): boolean;
 /**
  * Convert a date value to a plain JS Date object
  * @param anyDate any possible date
+ * @returns a plain JS Date object
+ */
+export function toJsDate(anyDate: AnyDate): Date;
+/**
+ * Convert a date value to a plain JS Date object
+ * @param anyDate any possible date
  * @returns a plain JS Date object or undefined if the input is null or undefined
  */
 export function toJsDate(anyDate: AnyDate | null | undefined): Date | undefined;
 
+
 export interface ToDateOnly {
+    /**
+     * Convert a date value to DateOnly object.
+     * `null` or `undefined` values will return `undefined` instead.
+     * @param anyDate any possible date
+     * @param locale optional locale if provided
+     * @returns a new date-only object
+     */
+    (anyDate: AnyDate, locale?: string): DateOnly;
     /**
      * Convert a date value to DateOnly object.
      * `null` or `undefined` values will return `undefined` instead.
@@ -942,7 +957,15 @@ export interface ToDateTime {
      * `null` or `undefined` values will return `undefined` instead.
      * @param anyDate any possible date
      * @param locale optional locale if provided
-     * @returns a new date-only object or undefined
+     * @returns a new date-time object
+     */
+    (anyDate: AnyDate, locale?: string): DateTime;
+    /**
+     * Convert a date value to DateTime object.
+     * `null` or `undefined` values will return `undefined` instead.
+     * @param anyDate any possible date
+     * @param locale optional locale if provided
+     * @returns a new date-time object or undefined
      */
     (anyDate: AnyDate | null | undefined, locale?: string): DateTime | undefined;
 
@@ -961,9 +984,19 @@ export interface ToDateTime {
      * @param anyDate any possible date
      * @param tz the timezone for the date
      * @param locale optional locale if provided
+     * @returns a new date-time at the specific timezone
+     */
+    tz(anyDate: AnyDate, tz: string, locale?: string): DateTime;
+    /**
+     * Convert a date value to DateTime object in a specific timezone.
+     * `null` or `undefined` values will return `undefined` instead.
+     * Just a shortcut for `toDateTime(anyDate, locale).toTimezone(tz)`.
+     * @param anyDate any possible date
+     * @param tz the timezone for the date
+     * @param locale optional locale if provided
      * @returns a new date-time at the specific timezone or undefined
      */
-    (anyDate: AnyDate | null | undefined, tz: string, locale?: string): DateTime | undefined;
+    tz(anyDate: AnyDate | null | undefined, tz: string, locale?: string): DateTime | undefined;
 }
 export const toDateTime: ToDateTime;
 
@@ -974,14 +1007,28 @@ export const toDateTime: ToDateTime;
  * @param options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
  * @returns the formatted date string
  */
-export function formatToDateOnly(anyDate: AnyDate | null | undefined, options?: { includeTimeAndZone?: boolean; }): string;
+export function formatToDateOnly(anyDate: AnyDate, options?: { includeTimeAndZone?: boolean; }): string;
+/**
+ * Format a date to a date-only format but without applying locale
+ * @param anyDate any possible date
+ * @param options optional formating options to customize the output
+ * @param options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
+ * @returns the formatted date string or undefined
+ */
+export function formatToDateOnly(anyDate: AnyDate | null | undefined, options?: { includeTimeAndZone?: boolean; }): string | undefined;
 
 /**
  * Format a date to a date-time format but without applying locale
  * @param anyDate any possible date
  * @returns the formatted date string
  */
-export function formatToDateTime(anyDate: AnyDate | null | undefined): string;
+export function formatToDateTime(anyDate: AnyDate): string;
+/**
+ * Format a date to a date-time format but without applying locale
+ * @param anyDate any possible date
+ * @returns the formatted date string or undefined
+ */
+export function formatToDateTime(anyDate: AnyDate | null | undefined): string | undefined;
 
 /**
  * Format a date to a date-only ormat applying locale
@@ -991,7 +1038,16 @@ export function formatToDateTime(anyDate: AnyDate | null | undefined): string;
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale
  */
-export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string;
+export function formatToDateOnlyWithLocale(anyDate: AnyDate, options?: { locale?: string; format?: string; }): string;
+/**
+ * Format a date to a date-only ormat applying locale
+ * @param anyDate any possible date
+ * @param options optional formating options to customize the output
+ * @param options.locale optional locale string. Defaults to the current locale set to the date or the default system locale
+ * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_LONG`. @see `LOCALE_FORMATS`
+ * @returns the formatted date string applying the locale or undefined
+ */
+export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string | undefined;
 
 /**
  * Format a date to a date-time format applying locale
@@ -1001,4 +1057,13 @@ export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, 
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale
  */
-export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string;
+export function formatToDateTimeWithLocale(anyDate: AnyDate, options?: { locale?: string; format?: string; }): string;
+/**
+ * Format a date to a date-time format applying locale
+ * @param anyDate any possible date
+ * @param options optional formating options to customize the output
+ * @param options.locale optional locale string. Defaults to the current locale set to the date or the default system locale
+ * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`. @see `LOCALE_FORMATS`
+ * @returns the formatted date string applying the locale or undefined
+ */
+export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string | undefined;

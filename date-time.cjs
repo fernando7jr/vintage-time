@@ -56,15 +56,6 @@ class DateTime {
     }
 
     /**
-     * Check if the value is DateOnly instance
-     * @param {*} value
-     * @returns {value is DateOnly}
-     */
-    static isDateOnly(value) {
-        return Boolean(value instanceof DateOnly || value?.isDateOnly);
-    }
-
-    /**
      * Compare two dates and return true if the first date has the same value as the second date.
      * If any of the dates is invalid then this method will return false.
      * @param {AnyDate} date any date value to be compared
@@ -656,7 +647,7 @@ class DateTime {
      */
     toISOString(useUtc = false) {
         if (!this.isValid) return this._innerDate.toString();
-        return this._innerDate.toISOString(!useUtc);
+        return this._innerDate.toISOString(!useUtc).replace(/\+00:00$/, 'Z');
     }
 
     /**

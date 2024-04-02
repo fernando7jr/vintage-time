@@ -59,9 +59,7 @@ function __getObjectValue(value) {
         case 'function':
             return value();
         default:
-            throw new Error(
-                `Unsuppo/Users/fernando/projs/deel/backend/utils/date/locale-formats.js /Users/fernando/projs/deel/backend/utils/date/regex.js /Users/fernando/projs/deel/backend/utils/date/sequelize.jsrted value type "${_type}" for DateTime obejct notation`
-            );
+            throw new Error(`Unsupported value type "${_type}" for DateOnly obejct notation`);
     }
 }
 

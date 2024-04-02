@@ -21,8 +21,8 @@ function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
             }
 
             const dateOnlyValue = DateOnly.fromAnyDate(value);
-            if (dateOnlyValue === 'Invalid date') {
-                throw new Error(`Can not set "Invalid date" to ${propertyName}`);
+            if (!dateOnlyValue.isValid) {
+                throw new Error(`Can not set "Invalid date" to "${propertyName}"`);
             } else {
                 this.setDataValue(propertyName, dateOnlyValue.toJSON());
             }
@@ -63,8 +63,8 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
             }
 
             const dateTimeValue = DateTime.fromAnyDate(value);
-            if (dateTimeValue === 'Invalid date') {
-                throw new Error(`Can not set "Invalid date" to ${propertyName}`);
+            if (!dateTimeValue.isValid) {
+                throw new Error(`Can not set "Invalid date" to "${propertyName}"`);
             } else {
                 this.setDataValue(propertyName, dateTimeValue.toJSON());
             }

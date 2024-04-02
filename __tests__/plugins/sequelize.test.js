@@ -11,6 +11,8 @@ describe('Date sequelize utils', () => {
     /** @typedef {Omit<DateDummy, 'id' | 'expiredAt' | 'storedAt'>} DateDummyCreationAttributes */
     /** @type {import('sequelize').ModelStatic<import('sequelize').Model<DateDummy, DateDummyCreationAttributes>>} */
     let model;
+    /** @type {import('sequelize').ModelStatic<import('sequelize').Model<DateDummy, DateDummyCreationAttributes>>} */
+    let modelStrict;
     /** @type {Sequelize} */
     let sequelize;
     beforeAll(async () => {
@@ -38,6 +40,34 @@ describe('Date sequelize utils', () => {
                 },
                 storedAt: {
                     ...dateTimeColumn('storedAt'),
+                    allowNull: false,
+                    defaultValue: () => toDateTime.now(),
+                },
+            },
+            {
+                tableName: 'dummies',
+                paranoid: false,
+            }
+        );
+
+        modelStrict = sequelize.define(
+            'DateDummy',
+            {
+                id: {
+                    type: DataTypes.SMALLINT,
+                    autoIncrement: true,
+                    primaryKey: true,
+                },
+                label: {
+                    type: DataTypes.STRING(20),
+                    allowNull: false,
+                },
+                expiredAt: {
+                    ...dateOnlyColumn('expiredAt', true),
+                    allowNull: true,
+                },
+                storedAt: {
+                    ...dateTimeColumn('storedAt', true),
                     allowNull: false,
                     defaultValue: () => toDateTime.now(),
                 },
@@ -189,5 +219,74 @@ describe('Date sequelize utils', () => {
             order: [['id', 'ASC']],
         });
         expect(getPlainObject(result)).toEqual(expected);
+    });
+
+    it('should get and set properties to null or undefined', () => {
+        const label = randomUUID();
+        const instance = new model({
+            label,
+            expiredAt: toDateOnly('2023-07-19'),
+            storedAt: toDateTime('2022-11-29'),
+        });
+
+        instance.expiredAt = null;
+        expect(instance.expiredAt).toBeNull();
+        instance.expiredAt = undefined;
+        expect(instance.expiredAt).toBeNull();
+
+        instance.storedAt = null;
+        expect(instance.storedAt).toBeNull();
+        instance.storedAt = undefined;
+        expect(instance.storedAt).toBeNull();
+    });
+
+    it('should fail to set properties when date value is invalid', () => {
+        const label = randomUUID();
+        const instance = new model({
+            label,
+            expiredAt: toDateOnly('2023-07-19'),
+            storedAt: toDateTime('2022-11-29'),
+        });
+
+        try {
+            instance.expiredAt = Number.NaN;
+            throw new Error('Should thrown an error');
+        } catch (error) {
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toBe('Can not set "Invalid date" to "expiredAt"');
+        }
+
+        try {
+            instance.storedAt = Number.NaN;
+            throw new Error('Should thrown an error');
+        } catch (error) {
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toBe('Can not set "Invalid date" to "storedAt"');
+        }
+    });
+
+    it('should fail to set properties when type is unexpected', () => {
+        const label = randomUUID();
+        const instance = new modelStrict({
+            label,
+            expiredAt: toDateOnly('2023-07-19'),
+            storedAt: toDateTime('2022-11-29'),
+        });
+
+        try {
+            instance.expiredAt = instance.storedAt;
+            throw new Error('Should thrown an error');
+        } catch (error) {
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toBe('Expected a DateOnly value for "expiredAt"');
+        }
+
+        try {
+            instance.storedAt = instance.expiredAt;
+            throw new Error('Should thrown an error');
+        } catch (error) {
+            expect(error).toBeInstanceOf(Error);
+            expect(error.message).toBe('Expected a DateTime value for "storedAt"');
+        }
     });
 });
