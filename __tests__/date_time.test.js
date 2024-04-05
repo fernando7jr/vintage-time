@@ -2,7 +2,7 @@ const moment = require('moment-timezone');
 
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
-const {toDateOnly, toDateTime, isDateValid} = require('../index.cjs');
+const {toDateOnly, toDateTime, isDateValid, formatToDateOnly} = require('../index.cjs');
 const {getLocalTimezone} = require('../utils/tz.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
@@ -841,8 +841,10 @@ describe('DateTime', () => {
                 const result = [
                     DateTime.fromDateTime(DateTime.invalid()),
                     DateTime.fromDateTime(DateTime.invalid(), CUSTOM_LOCALE),
+                    DateTime.fromDateTime(false),
+                    DateTime.fromDateTime(NaN, CUSTOM_LOCALE),
                 ];
-                expect(result.map(isDateValid)).toEqual([false, false]);
+                expect(result.map(isDateValid)).toEqual(result.map(() => false));
             });
 
             it('should handle weird DateTime object', () => {
@@ -868,6 +870,62 @@ describe('DateTime', () => {
                 expect(result.toJSON()).toBe('2020-02-01T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
                 expect(result.timezone).toBe('UTC');
+            });
+
+            it('should construct from a string', () => {
+                const cases = [
+                    '2000-01-03',
+                    '2000-02-04T22:33:44',
+                    '2000-03-05T22:33:44.222',
+                    '2000-04-06T22:33:44Z',
+                    '2000-05-07T22:33:44.222Z',
+                    '2000-06-08T22:33:44+03:00',
+                    '2000-07-09T22:33:44.222+03:00',
+                ];
+                const expectedStringValueByCase = {
+                    '2000-01-03': '2000-01-03T00:00:00.000Z',
+                    '2000-02-04T22:33:44': '2000-02-04T22:33:44.000Z',
+                    '2000-03-05T22:33:44.222': '2000-03-05T22:33:44.222Z',
+                    '2000-04-06T22:33:44Z': '2000-04-06T22:33:44.000Z',
+                    '2000-05-07T22:33:44.222Z': '2000-05-07T22:33:44.222Z',
+                    '2000-06-08T22:33:44+03:00': '2000-06-08T19:33:44.000Z',
+                    '2000-07-09T22:33:44.222+03:00': '2000-07-09T19:33:44.222Z',
+                };
+                const getExpectedStringValue = (s) => expectedStringValueByCase[s];
+
+                for (const stringValue of cases) {
+                    let result = DateTime.fromDateTime(stringValue);
+                    expect(result).toBeDefined();
+                    expect(result.isDateTime).toBe(true);
+                    expect(result.toISOString(true)).toEqual(getExpectedStringValue(stringValue));
+                    expect(result.locale).toBe(DEFAULT_LOCALE);
+
+                    result = DateTime.fromDateTime(stringValue, CUSTOM_LOCALE);
+                    expect(result).toBeDefined();
+                    expect(result.isDateTime).toBe(true);
+                    expect(result.toISOString(true)).toEqual(getExpectedStringValue(stringValue));
+                    expect(result.locale).toBe(CUSTOM_LOCALE);
+                }
+            });
+
+            it('should handle a numeric timestamp', () => {
+                const dateValue = new Date(2020, 1, 1, 2, 13);
+                const result = DateTime.fromDateTime(dateValue.getTime());
+                expect(result).toBeInstanceOf(DateTime);
+                expect(result.isDateTime).toBe(true);
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                    hour: 2,
+                    minute: 13,
+                    second: 0,
+                    millisecond: 0,
+                    offset: DEFAULT_TZ_OFFSET,
+                    timezone: DEFAULT_TZ,
+                });
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+                expect(result.timezone).toBe(DEFAULT_TZ);
             });
 
             it('should thrown on unexpected DateTime object', () => {
@@ -1015,6 +1073,33 @@ describe('DateTime', () => {
                 expect(result.toJSON()).toBe('2020-02-01T00:00:00.000Z');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
                 expect(result.timezone).toBe('UTC');
+            });
+
+            it('should construct from a string', () => {
+                const cases = [
+                    '2000-01-03',
+                    '2000-02-04T22:33:44',
+                    '2000-03-05T22:33:44.222',
+                    '2000-04-06T22:33:44Z',
+                    '2000-05-07T22:33:44.222Z',
+                    '2000-06-08T22:33:44+03:00',
+                    '2000-07-09T10:33:44.222+03:00',
+                ];
+                const getExpectedStringValue = (s) => formatToDateOnly(s, {includeTimeAndZone: true});
+
+                for (const stringValue of cases) {
+                    let result = DateTime.fromDateOnly(stringValue);
+                    expect(result).toBeDefined();
+                    expect(result.isDateTime).toBe(true);
+                    expect(result.toISOString(true)).toEqual(getExpectedStringValue(stringValue));
+                    expect(result.locale).toBe(DEFAULT_LOCALE);
+
+                    result = DateTime.fromDateOnly(stringValue, CUSTOM_LOCALE);
+                    expect(result).toBeDefined();
+                    expect(result.isDateTime).toBe(true);
+                    expect(result.toISOString(true)).toEqual(getExpectedStringValue(stringValue));
+                    expect(result.locale).toBe(CUSTOM_LOCALE);
+                }
             });
         });
 
@@ -1620,6 +1705,8 @@ describe('DateTime', () => {
                     DateTime.fromAnyDate(undefined, CUSTOM_LOCALE),
                     DateTime.fromAnyDate(NaN),
                     DateTime.fromAnyDate(NaN, CUSTOM_LOCALE),
+                    DateTime.fromAnyDate({}),
+                    DateTime.fromAnyDate({}, CUSTOM_LOCALE),
                 ];
                 expect(result.map(isDateValid)).toEqual(result.map(() => false));
             });
@@ -2343,28 +2430,24 @@ describe('DateTime', () => {
 
     describe('compatibility', () => {
         it('should allow to construct a new moment object directly', () => {
-            const dateOnly = DateOnly.now();
-            expect(dateOnly).toBeInstanceOf(DateOnly);
-            const m = moment(dateOnly);
+            const dateTime = DateTime.now();
+            expect(dateTime).toBeInstanceOf(DateTime);
+            const m = moment(dateTime);
             expect(moment.isMoment(m)).toBe(true);
             expect(m instanceof moment).toBe(true);
-            expect(m instanceof DateOnly).toBe(false);
-            expect(DateOnly.isDateOnly(m)).toBe(false);
-            expect(m.format('YYYY-MM-DD')).toEqual(dateOnly.toJSON());
-            expect({year: m.year(), month: m.month() + 1, day: m.date()}).toEqual(dateOnly.toObject());
+            expect(m instanceof DateTime).toBe(false);
+            expect(DateTime.isDateTime(m)).toBe(false);
+            expect(m.toISOString(true).replace('+00:00', 'Z')).toEqual(dateTime.toISOString(false));
         });
 
         it('should allow to construct a new JS Date object directly', () => {
-            const dateOnly = DateOnly.now();
-            expect(dateOnly).toBeInstanceOf(DateOnly);
-            const jsDate = new Date(dateOnly);
+            const dateTime = DateTime.now();
+            expect(dateTime).toBeInstanceOf(DateTime);
+            const jsDate = new Date(dateTime);
             expect(jsDate instanceof Date).toBe(true);
-            expect(jsDate instanceof DateOnly).toBe(false);
-            expect(DateOnly.isDateOnly(jsDate)).toBe(false);
-            expect(jsDate.toISOString()).toEqual(dateOnly.toISOString());
-            expect({year: jsDate.getFullYear(), month: jsDate.getMonth() + 1, day: jsDate.getDate()}).toEqual(
-                dateOnly.toObject()
-            );
+            expect(jsDate instanceof DateTime).toBe(false);
+            expect(DateTime.isDateTime(jsDate)).toBe(false);
+            expect(jsDate.toISOString()).toEqual(dateTime.toISOString(true));
         });
     });
 });

@@ -2,7 +2,7 @@ const JoiModule = require('joi');
 
 const {DateOnly} = require('../../date-only.cjs');
 const {DateTime} = require('../../date-time.cjs');
-const {formatToDateOnly, toDateTime} = require('../../index.cjs');
+const {formatToDateOnly, toDateTime, toDateOnly} = require('../../index.cjs');
 const {anyDate, dateOnly, dateTime} = require('../../plugins/joi.cjs');
 
 describe('Joi Date Extensions', () => {
@@ -14,7 +14,7 @@ describe('Joi Date Extensions', () => {
     };
 
     describe('anyDate', () => {
-        const schema = joi.anyDate();
+        const schema = joi.anyDate().allow(null);
 
         it.each([
             '2023-01-01',
@@ -29,6 +29,12 @@ describe('Joi Date Extensions', () => {
             expect(formatToDateOnly(result.value)).toEqual(formatToDateOnly(value));
         });
 
+        it.each([null, undefined])('should accept "%s"', (value) => {
+            const result = validate(schema, value);
+            expect(result.isValid).toBe(true);
+            expect(result.value).toEqual(value);
+        });
+
         it.each(['01/01/2000', '2000/01/01', '99-02-15', '2023-01-01 00:00:00', '2023-01-01 00:00:00', 1425215164236])(
             'should reject "%s"',
             (value) => {
@@ -38,13 +44,19 @@ describe('Joi Date Extensions', () => {
     });
 
     describe('dateOnly', () => {
-        const schema = joi.dateOnly();
+        const schema = joi.dateOnly().allow(null);
 
         it.each(['2023-01-01', '1990-10-12'])('should accept "%s"', (value) => {
             const result = validate(schema, value);
             expect(result.isValid).toBe(true);
             expect(result.value).toBeInstanceOf(DateOnly);
             expect(formatToDateOnly(result.value)).toEqual(value);
+        });
+
+        it.each([null, undefined])('should accept "%s"', (value) => {
+            const result = validate(schema, value);
+            expect(result.isValid).toBe(true);
+            expect(result.value).toEqual(value);
         });
 
         it.each([
@@ -63,7 +75,7 @@ describe('Joi Date Extensions', () => {
     });
 
     describe('dateTime', () => {
-        const schema = joi.dateTime();
+        const schema = joi.dateTime().allow(null);
 
         it.each([
             '2023-01-01T00:00:00Z',
@@ -76,6 +88,12 @@ describe('Joi Date Extensions', () => {
             expect(result.isValid).toBe(true);
             expect(result.value).toBeInstanceOf(DateTime);
             expect(result.value.valueOf()).toEqual(toDateTime(value).valueOf());
+        });
+
+        it.each([null, undefined])('should accept "%s"', (value) => {
+            const result = validate(schema, value);
+            expect(result.isValid).toBe(true);
+            expect(result.value).toEqual(value);
         });
 
         it.each([
