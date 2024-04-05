@@ -2437,7 +2437,7 @@ describe('DateTime', () => {
             expect(m instanceof moment).toBe(true);
             expect(m instanceof DateTime).toBe(false);
             expect(DateTime.isDateTime(m)).toBe(false);
-            expect(m.toISOString(true)).toEqual(dateTime.toISOString(false));
+            expect(m.toISOString(true).replace('+00:00', 'Z')).toEqual(dateTime.toISOString(false));
         });
 
         it('should allow to construct a new JS Date object directly', () => {
