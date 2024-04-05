@@ -175,3 +175,171 @@ Shortcut for calling `DateTime.now()` which returns a DateTime instance from the
 ````javascript
 const dateTime = toDateTime.now(); // Simillar to: toDateTime(new Date())
 ````
+
+## Plugins
+
+### Sequelize
+
+`vintage-time` requires sequelize `6.x` installed. Please make sure to have it installed in order to work.
+
+*Even without using the plugin, sequelize already accepts both `DateOnly` and `DateTime` for queries.*
+
+Since sequeize only supports JS natve Dates, we need to define getters and setters to our Date properties in order to use a different class.
+This plugin offers two built-in methods to define the getters and setters.
+
+#### dateOnlyColumn
+
+````typescript
+function dateOnlyColumn(propertyName: string, strict?: boolean): {
+    type: typeof DataTypes.DATEONLY,
+    get(): DateOnly | null;
+    set(value: any): void;
+};
+````
+
+Used to defined a `DateOnly` column (sequelize type **DATEONLY**).
+
+````javascript
+const {dateOnlyColumn} = require('vintage-time/plugins/sequelize');
+const model = sequelize.define('DateDummy', {
+        startDate: {
+            ...dateOnlyColumn('startDate'),
+            allowNull: true,
+        },
+    },
+    {tableName: 'dummies'}
+);
+
+// ...
+
+const entry = model.findOne();
+console.log(entry.startDate instanceof DateOnly); // true
+````
+
+The parameter `strict` when `true` enforces that the setter should only accept DateOnly instances. Otherwise when `false` it attempts to convert any value to a `DateOnly` instance.
+
+#### dateTimeColumn
+
+````typescript
+function dateTimeColumn(propertyName: string, strict?: boolean): {
+    type: typeof DataTypes.DATEO,
+    get(): DateTime | null;
+    set(value: any): void;
+};
+````
+
+Used to defined a `DateTime` column (sequelize type **DATE**).
+
+````javascript
+const {dateTimeColumn} = require('vintage-time/plugins/sequelize');
+const model = sequelize.define('DateDummy', {
+        archivedAt: {
+            ...dateTimeColumn('archivedAt'),
+            allowNull: false,
+            defaultValue: () => toDateTime.now(),
+        },
+    },
+    {tableName: 'dummies'}
+);
+
+// ...
+
+const entry = model.findOne();
+console.log(entry.archivedAt instanceof DateTime); // true
+````
+
+The parameter `strict` when `true` enforces that the setter should only accept DateOnly instances. Otherwise when `false` it attempts to convert any value to a `DateTime` instance.
+
+### Joi
+
+`vintage-time` requires joi `17.x` installed. Please make sure to have it installed in order to work.
+
+The plugin exposes a set of validators to be used together with Joi validation schemas.
+
+#### anyDate
+
+Accepts both `DateOnl`y and `DateTime` compatible strings.
+Unless it is set to `raw()`, the validator outputs a `DateTime` instance.
+
+````javascript
+const {anyDate} = require('vintage-time/plugins/joi');
+joi = joi.extend(anyDate);
+
+const schema = joi.object().keys({date: joi.anyDate()});
+// These are valid strings
+schema.validate({date: '2020-07-19'});
+schema.validate({date: '2020-07-19 00:00:00.000Z'});
+schema.validate({date: '2020-07-19 00:00:00Z'});
+schema.validate({date: '2020-07-19 00:00:00-03:00'});
+schema.validate({date: '2020-07-19 01:20:03'});
+schema.validate({date: '2020-07-19 01:20:03.657Z'});
+schema.validate({date: '2020-07-19T00:00:00Z'});
+schema.validate({date: '2020-07-19T00:00:00-03:00'});
+schema.validate({date: '2020-07-19T01:20:03'});
+schema.validate({date: '2020-07-19T01:20:03.657Z'});
+
+// These are not
+schema.validate({date: '07/19/2020'});
+schema.validate({date: '2020/07/19'});
+schema.validate({date: '01:20:03.657Z'});
+schema.validate({date: '2020/07/19 at 3:00 PM'});
+````
+
+#### dateOnly
+
+Accepts `DateOnly` compatible strings.
+Unless it is set to `raw()`, the validator outputs a `DateOnly` instance.
+
+````javascript
+const {dateOnly} = require('vintage-time/plugins/joi');
+joi = joi.extend(dateOnly);
+
+const schema = joi.object().keys({date: joi.dateOnly()});
+// These are valid strings
+schema.validate({date: '2020-07-19'});
+schema.validate({date: '1990-01-11'});
+
+// These are not
+schema.validate({date: '2020-07-19 00:00:00Z'});
+schema.validate({date: '2020-07-19 00:00:00-03:00'});
+schema.validate({date: '2020-07-19 01:20:03'});
+schema.validate({date: '2020-07-19 01:20:03.657Z'});
+schema.validate({date: '2020-07-19T01:20:03'});
+schema.validate({date: '2020-07-19T01:20:03.657Z'});
+schema.validate({date: '2020-07-19T00:00:00Z'});
+schema.validate({date: '2020-07-19T00:00:00-03:00'});
+schema.validate({date: '07/19/2020'});
+schema.validate({date: '2020/07/19'});
+schema.validate({date: '01:20:03.657Z'});
+schema.validate({date: '2020/07/19 at 3:00 PM'});
+````
+
+#### dateTime
+
+Accepts `DateTime` compatible strings.
+Unless it is set to `raw()`, the validator outputs a `DateTime` instance.
+
+````javascript
+const {dateTime} = require('vintage-time/plugins/joi');
+joi = joi.extend(dateTime);
+
+const schema = joi.object().keys({date: joi.dateTime()});
+// These are valid strings
+schema.validate({date: '2020-07-19 00:00:00.000Z'});
+schema.validate({date: '2020-07-19 00:00:00Z'});
+schema.validate({date: '2020-07-19 00:00:00-03:00'});
+schema.validate({date: '2020-07-19 01:20:03'});
+schema.validate({date: '2020-07-19 01:20:03.657Z'});
+schema.validate({date: '2020-07-19T00:00:00Z'});
+schema.validate({date: '2020-07-19T00:00:00-03:00'});
+schema.validate({date: '2020-07-19T01:20:03'});
+schema.validate({date: '2020-07-19T01:20:03.657Z'});
+
+// These are not
+schema.validate({date: '2020-07-19'});
+schema.validate({date: '1990-01-11'});
+schema.validate({date: '07/19/2020'});
+schema.validate({date: '2020/07/19'});
+schema.validate({date: '01:20:03.657Z'});
+schema.validate({date: '2020/07/19 at 3:00 PM'});
+````

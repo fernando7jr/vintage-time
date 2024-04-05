@@ -155,6 +155,21 @@ export class DateTime {
         return new DateTime(moment(NaN));
     }
 
+    static _fromString(dateString, locale) {
+        if (DATE_ONLY_REGEX.test(dateString)) {
+            return this.fromDateOnly(dateString, locale);
+        } else if (TIME_WITHOUT_ZONE_REGEX.test(dateString)) {
+            return this.fromMomentDate(moment.tz(dateString, 'UTC'), locale);
+        } else if (DATE_TIME_REGEX.test(dateString)) {
+            const offset = extractTimezoneOffset(dateString);
+            const momentDate = moment(dateString).utcOffset(offset === 'Z' ? '+00:00' : offset);
+            return this.fromMomentDate(momentDate, locale);
+        }
+        const dateValue = new Date(dateString);
+        if (isNaN(dateValue)) return this.invalid();
+        return new DateTime(moment(dateValue), locale);
+    }
+
     /**
      * Construct a new date-time from a moment object value
      * @param {Moment} date any moment date
@@ -182,25 +197,28 @@ export class DateTime {
         if (dateTime instanceof DateTime) {
             return new DateTime(dateTime._innerDate, locale);
         } else if (typeof dateTime === 'string') {
-            return new DateTime(moment(dateTime), locale);
-        } else if (typeof dateTime === 'object') {
-            const month = __getObjectValue(dateTime.month);
-            const obj = {
-                year: __getObjectValue(dateTime.year),
-                month: month ? month - 1 : undefined,
-                date: __getObjectValue(dateTime.day) || __getObjectValue(dateTime.date),
-                hour: __getObjectValue(dateTime.hour) || __getObjectValue(dateTime.hours),
-                minute: __getObjectValue(dateTime.minute) || __getObjectValue(dateTime.minutes),
-                second: __getObjectValue(dateTime.second) || __getObjectValue(dateTime.seconds),
-                millisecond: __getObjectValue(dateTime.millisecond) || __getObjectValue(dateTime.milliseconds),
-            };
-            const tz = __getObjectValue(dateTime.timezone) || __getObjectValue(dateTime.tz);
-            if (tz) return new DateTime(moment.tz(obj, tz), locale);
-            const offset = __getObjectValue(dateTime.offset);
-            if (offset) return new DateTime(moment(obj).utcOffset(offset, true), locale);
-            return new DateTime(moment(obj), locale);
+            return DateTime._fromString(dateTime, locale);
+        } else if (typeof dateTime === 'number') {
+            return DateTime.fromJsDate(new Date(dateTime));
+        } else if (typeof dateTime !== 'object') {
+            return DateTime.invalid();
         }
-        return new DateTime(moment(String(dateTime)), locale);
+        
+        const month = __getObjectValue(dateTime.month);
+        const obj = {
+            year: __getObjectValue(dateTime.year),
+            month: month ? month - 1 : undefined,
+            date: __getObjectValue(dateTime.day) || __getObjectValue(dateTime.date),
+            hour: __getObjectValue(dateTime.hour) || __getObjectValue(dateTime.hours),
+            minute: __getObjectValue(dateTime.minute) || __getObjectValue(dateTime.minutes),
+            second: __getObjectValue(dateTime.second) || __getObjectValue(dateTime.seconds),
+            millisecond: __getObjectValue(dateTime.millisecond) || __getObjectValue(dateTime.milliseconds),
+        };
+        const tz = __getObjectValue(dateTime.timezone) || __getObjectValue(dateTime.tz);
+        if (tz) return new DateTime(moment.tz(obj, tz), locale);
+        const offset = __getObjectValue(dateTime.offset);
+        if (offset) return new DateTime(moment(obj).utcOffset(offset, true), locale);
+        return new DateTime(moment(obj), locale);
     }
 
     /**
@@ -220,7 +238,7 @@ export class DateTime {
                 locale
             );
         }
-        return new DateTime(moment.tz(String(dateOnly), 'UTC'), locale || dateOnly.locale);
+        return new DateTime(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale || dateOnly.locale);
     }
 
     /**
@@ -235,16 +253,7 @@ export class DateTime {
         else if (moment.isMoment(anyDate)) return this.fromMomentDate(anyDate, locale);
         else if (anyDate instanceof Date) return this.fromJsDate(anyDate, locale);
         else if (typeof anyDate === 'number') return this.fromJsDate(new Date(anyDate), locale);
-        else if (typeof anyDate === 'string') {
-            if (DATE_ONLY_REGEX.test(anyDate)) return this.fromDateOnly(anyDate, locale);
-            else if (TIME_WITHOUT_ZONE_REGEX.test(anyDate))
-                return this.fromMomentDate(moment.tz(anyDate, 'UTC'), locale);
-            else if (DATE_TIME_REGEX.test(anyDate)) {
-                const offset = extractTimezoneOffset(anyDate);
-                const momentDate = moment(anyDate).utcOffset(offset === 'Z' ? '+00:00' : offset);
-                return this.fromMomentDate(momentDate, locale);
-            }
-        }
+        else if (typeof anyDate === 'string') return this._fromString(anyDate, locale);
         return this.fromJsDate(new Date(new String(anyDate)), locale);
     }
 
@@ -270,10 +279,6 @@ export class DateTime {
      */
     constructor(date, locale) {
         this._innerDate = locale ? moment(date).locale(locale) : moment(date);
-    }
-
-    get [Symbol.toStringTag]() {
-        return 'Date';
     }
 
     get isDateTime() {
@@ -630,7 +635,7 @@ export class DateTime {
         return this.valueOf() === dateTime.valueOf();
     }
 
-    /**
+   /**
      * Return a plain JS Date object based on this DateTime value.
      * The Date object is going to be at the local timezone, so the date might be off by one day.
      * Same as calling `new Date(this.toTimestamp())` or `new Date(this.toISOString())`.
