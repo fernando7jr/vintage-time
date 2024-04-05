@@ -131,6 +131,86 @@ class DateTime {
     }
 
     /**
+     * Compare the date to `DateTime.now()` and return true if the first date is before `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is before `DateTime.now()`
+     */
+    static isBeforeNow(date) {
+        return this.isBefore(date, DateTime.now());
+    }
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is after `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is after `DateTime.now()`
+     */
+    static isAfterNow(date) {
+        return this.isAfter(date, DateTime.now());
+    }
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is before or equal `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is before or equal `DateTime.now()`
+     */
+    static isEqualOrBeforeNow(date) {
+        return this.isEqualOrBefore(date, DateTime.now());
+    }
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is after ir equal `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is after or equal `DateTime.now()`
+     */
+    static isEqualOrAfterNow(date) {
+        return this.isEqualOrAfter(date, DateTime.now());
+    }
+
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param {Array<{AnyDate | null | undefined}>} dates set of date values
+     * @returns {AnyDate | undefined} the item wich the value is the minumum from the set
+     */
+    static min(...dates) {
+        let minAnyDate = undefined;
+        let minDateTime = undefined;
+        for (const anyDate of dates) {
+            const dateTime = this.fromAnyDate(anyDate);
+            if (!dateTime.isValid) continue;
+            if (!minDateTime || dateTime < minDateTime) {
+                minAnyDate = anyDate;
+                minDateTime = dateTime;
+            }
+        }
+        return minAnyDate;
+    }
+    
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param {AnyDate | null | undefined} dates set of date values
+     * @returns {AnyDate | undefined} the item wich the value is the maximum from the set
+     */
+    static max(...dates) {
+        let maxAnyDate = undefined;
+        let maxDateTime = undefined;
+        for (const anyDate of dates) {
+            const dateTime = this.fromAnyDate(anyDate);
+            if (!dateTime.isValid) continue;
+            if (!maxDateTime || dateTime > maxDateTime) {
+                maxAnyDate = anyDate;
+                maxDateTime = dateTime;
+            }
+        }
+        return maxAnyDate;
+    }
+
+    /**
      * Get a new date-time using the current system time for its value
      * @param {string | undefined} locale optional locale if provided
      * @returns {DateTime} a new date-time using the current system time for its value
@@ -702,6 +782,19 @@ class DateTime {
         };
     }
 
+    /**
+     * Return a debug string 
+     * @returns {string}
+     * @example
+     * ````javascript
+     * console.log(toDateTime('2023-04-15').debug()); // Print: "DateTime(2023-04-15T00:00:00.000Z)"
+     * console.log(toDateTime('2023-04-15T22:13:14.333Z').debug()); // Print: "DateTime(2023-04-15 22:13:14.333Z)"
+     * ````
+     */
+    debug() {
+        return `DateTime(${this.toISOString(false).replace('T', ' ')})`;
+    }
+
     // MomentJs/Sequelize Compatibility layer
     get [Symbol.toStringTag]() {
         return 'Date';
@@ -709,7 +802,7 @@ class DateTime {
 
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
-        return `DateTime(${this.toISOString(false).replace('T', ' ')})`;
+        return this.debug();
     }
 
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */

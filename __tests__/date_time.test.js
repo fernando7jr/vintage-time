@@ -474,6 +474,158 @@ describe('DateTime', () => {
             });
         });
 
+        describe('isEqualOrBeforeNow', () => {
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const NOW = DateTime.now();
+            const compareFn = (a) => DateTime.isEqualOrBeforeNow(a);
+
+            it('should return true when the first date is equal or before now', () => {
+                expect(compareFn(NOW.minus({days: 1}))).toBe(true);
+                expect(compareFn(NOW.minus({month: 1}))).toBe(true);
+            });
+
+            it('should return false when the first date is not equal or before the second date', () => {
+                expect(compareFn(NOW.plus({days: 1}))).toBe(false);
+                expect(compareFn(NOW.plus({month: 1}))).toBe(false);
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const date of invalidDates) {
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                }
+            });
+        });
+
+        describe('isEqualOrAfterNow', () => {
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const NOW = DateTime.now();
+            const compareFn = (a) => DateTime.isEqualOrAfterNow(a);
+
+            it('should return true when the first date is equal or before now', () => {
+                expect(compareFn(NOW.plus({days: 1}))).toBe(true);
+                expect(compareFn(NOW.plus({month: 1}))).toBe(true);
+            });
+
+            it('should return false when the first date is not equal or before the second date', () => {
+                expect(compareFn(NOW.minus({days: 1}))).toBe(false);
+                expect(compareFn(NOW.minus({month: 1}))).toBe(false);
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const date of invalidDates) {
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                }
+            });
+        });
+
+        describe('isBeforeNow', () => {
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const NOW = DateTime.now();
+            const compareFn = (a) => DateTime.isBeforeNow(a);
+
+            it('should return true when the first date is equal or before now', () => {
+                expect(compareFn(NOW.minus({days: 1}))).toBe(true);
+                expect(compareFn(NOW.minus({month: 1}))).toBe(true);
+            });
+
+            it('should return false when the first date is not equal or before the second date', () => {
+                expect(compareFn(NOW.plus({days: 1}))).toBe(false);
+                expect(compareFn(NOW.plus({month: 1}))).toBe(false);
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const date of invalidDates) {
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                }
+            });
+        });
+
+        describe('isAfterNow', () => {
+            const invalidDates = [
+                DateOnly.invalid(),
+                DateTime.invalid(),
+                null,
+                undefined,
+                '2023-02-31',
+                '9999-44-99',
+            ]
+
+            const NOW = DateTime.now();
+            const compareFn = (a) => DateTime.isAfterNow(a);
+
+            it('should return true when the first date is equal or before now', () => {
+                expect(compareFn(NOW.plus({days: 1}))).toBe(true);
+                expect(compareFn(NOW.plus({month: 1}))).toBe(true);
+            });
+
+            it('should return false when the first date is not equal or before the second date', () => {
+                expect(compareFn(NOW.minus({days: 1}))).toBe(false);
+                expect(compareFn(NOW.minus({month: 1}))).toBe(false);
+            });
+
+            it('should return false when at least one of the values is invalid', () => {
+                for (const date of invalidDates) {
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                    expect(compareFn(date)).toBe(false);
+                }
+            });
+        });
+
+        describe('min', () => {
+            it('should get the minimum value', () => {
+                const values = ['2023-01-01', '2023-10-09 20:33:44.000Z', toDateOnly(NaN), toDateTime('1999-02-99')];
+                expect(DateTime.min(...values)).toBe('2023-01-01');
+                expect(DateTime.min(...values.reverse())).toBe('2023-01-01');
+            });
+
+            it('should return undefined when the list is empty', () => {
+                expect(DateTime.min()).toEqual(undefined);
+            });
+        });
+
+        describe('max', () => {
+            it('should get the minimum value', () => {
+                const values = ['2023-01-01', '2023-10-09 20:33:44.000Z', toDateOnly(NaN), toDateTime('1999-02-99')];
+                expect(DateTime.max(...values)).toBe('2023-10-09 20:33:44.000Z');
+                expect(DateTime.max(...values.reverse())).toBe('2023-10-09 20:33:44.000Z');
+            });
+
+            it('should return undefined when the list is empty', () => {
+                expect(DateTime.max()).toEqual(undefined);
+            });
+        });
+
         describe('now', () => {
             it('should get date now without a custom locale', () => {
                 const date = new Date();
@@ -2424,6 +2576,18 @@ describe('DateTime', () => {
                 expect(result.equals(dateTime)).toBe(true);
                 result = dateTime.minus({clocks: 9});
                 expect(result.equals(dateTime)).toBe(true);
+            });
+        });
+
+        describe('debug', () => {
+            it('should return a debug string', () => {
+                let date = toDateTime('2023-04-15');
+                expect(date.debug()).toBe('DateTime(2023-04-15 00:00:00.000Z)');
+                expect(date[Symbol.for('nodejs.util.inspect.custom')]()).toBe('DateTime(2023-04-15 00:00:00.000Z)');
+
+                date = toDateTime('2023-04-15T22:13:14.333Z');
+                expect(date.debug()).toBe('DateTime(2023-04-15 22:13:14.333Z)');
+                expect(date[Symbol.for('nodejs.util.inspect.custom')]()).toBe('DateTime(2023-04-15 22:13:14.333Z)');
             });
         });
     });

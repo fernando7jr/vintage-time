@@ -67,6 +67,68 @@ export class DateOnly {
     static isEqualOrAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
 
     /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is before `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is before `DateOnly.now()`
+     */
+    static isBeforeNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is after `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is after `DateOnly.now()`
+     */
+    static isAfterNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is before or equal `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is before or equal `DateOnly.now()`
+     */
+    static isEqualOrBeforeNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is after ir equal `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is after or equal `DateOnly.now()`
+     */
+    static isEqualOrAfterNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the minumum from the set
+     */
+    static min<T extends AnyDate>(date: T, ...dates: Array<T | null | undefined>): T;
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the minumum from the set
+     */
+    static min<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
+    
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the maximum from the set
+     */
+    static max<T extends AnyDate>(date: T, ...dates: Array<T | null | undefined>): T;
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the maximum from the set
+     */
+    static max<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
+
+    /**
      * Get a new date-only using the current system time for its value
      * @param locale optional locale if provided
      * @returns a new date-only using the current system time for its value
@@ -415,6 +477,15 @@ export class DateOnly {
      * @returns an plain JS object representing this DateOnly.
      */
     toObject(): DateOnlyLike;
+
+    /**
+     * Return a debug string 
+     * @example
+     * ````javascript
+     * console.log(toDateTime('2023-04-15')); // Print: "DateOnly(2023-04-15)"
+     * ````
+     */
+    debug(): string;
 }
 
 export type DateTimeLike = Pick<DateTime, 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'> & Partial<Pick<DateTime, 'timezone' | 'offset'>>;
@@ -477,6 +548,68 @@ export class DateTime {
      * @returns true if the first date is after or equal the second date
      */
     static isEqualOrAfter(date: AnyDate | null | undefined, compareDate: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is before `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is before `DateTime.now()`
+     */
+    static isBeforeNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is after `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is after `DateTime.now()`
+     */
+    static isAfterNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is before or equal `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is before or equal `DateTime.now()`
+     */
+    static isEqualOrBeforeNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Compare the date to `DateTime.now()` and return true if the first date is after ir equal `DateTime.now()`.
+     * If the date is invalid then this method will return false.
+     * @param date any date value to be compared
+     * @returns true if the first date is after or equal `DateTime.now()`
+     */
+    static isEqualOrAfterNow(date: AnyDate | null | undefined): boolean;
+
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the minumum from the set
+     */
+    static min<T extends AnyDate>(date: T, ...dates: Array<T | null | undefined>): T;
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the minumum from the set
+     */
+    static min<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
+    
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the maximum from the set
+     */
+    static max<T extends AnyDate>(date: T, ...dates: Array<T | null | undefined>): T;
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param dates set of date values
+     * @returns the item wich the value is the maximum from the set
+     */
+    static max<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
 
     /**
      * Get a new date-time using the current system time for its value
@@ -888,6 +1021,16 @@ export class DateTime {
      * @returns an plain JS object representing this DateTime.
      */
     toObject(): DateTimeLike;
+
+    /**
+     * Return a debug string 
+     * @example
+     * ````javascript
+     * console.log(toDateTime('2023-04-15').debug()); // Print: "DateTime(2023-04-15T00:00:00.000Z)"
+     * console.log(toDateTime('2023-04-15T22:13:14.333Z').debug()); // Print: "DateTime(2023-04-15 22:13:14.333Z)"
+     * ````
+     */
+    debug(): string;
 }
 
 export type DateFormatingOptions = { locale?: string | boolean; toISOForm?: boolean; format?: string; };

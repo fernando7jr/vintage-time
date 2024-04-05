@@ -152,6 +152,86 @@ class DateOnly {
     }
 
     /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is before `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is before `DateOnly.now()`
+     */
+    static isBeforeNow(date) {
+        return this.isBefore(date, DateOnly.now());
+    }
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is after `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is after `DateOnly.now()`
+     */
+    static isAfterNow(date) {
+        return this.isAfter(date, DateOnly.now());
+    }
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is before or equal `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is before or equal `DateOnly.now()`
+     */
+    static isEqualOrBeforeNow(date) {
+        return this.isEqualOrBefore(date, DateOnly.now());
+    }
+
+    /**
+     * Compare the date to `DateOnly.now()` and return true if the first date is after ir equal `DateOnly.now()`.
+     * If the date is invalid then this method will return false.
+     * @param {AnyDate | null | undefined} date any date value to be compared
+     * @returns {boolean} true if the first date is after or equal `DateOnly.now()`
+     */
+    static isEqualOrAfterNow(date) {
+        return this.isEqualOrAfter(date, DateOnly.now());
+    }
+
+    /**
+     * Return the min from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param {Array<{AnyDate | null | undefined}>} dates set of date values
+     * @returns {AnyDate | undefined} the item wich the value is the minumum from the set
+     */
+    static min(...dates) {
+        let minAnyDate = undefined;
+        let minDateOnly = undefined;
+        for (const anyDate of dates) {
+            const dateOnly = this.fromAnyDate(anyDate);
+            if (!dateOnly.isValid) continue;
+            if (!minDateOnly || dateOnly < minDateOnly) {
+                minAnyDate = anyDate;
+                minDateOnly = dateOnly;
+            }
+        }
+        return minAnyDate;
+    }
+    
+    /**
+     * Return the max from a set of dates. Invalid values are not considered.
+     * If the set is empty or there is no valid value then it returns `undefined`.
+     * @param {AnyDate | null | undefined} dates set of date values
+     * @returns {AnyDate | undefined} the item wich the value is the maximum from the set
+     */
+    static max(...dates) {
+        let maxAnyDate = undefined;
+        let maxDateOnly = undefined;
+        for (const anyDate of dates) {
+            const dateOnly = this.fromAnyDate(anyDate);
+            if (!dateOnly.isValid) continue;
+            if (!maxDateOnly || dateOnly > maxDateOnly) {
+                maxAnyDate = anyDate;
+                maxDateOnly = dateOnly;
+            }
+        }
+        return maxAnyDate;
+    }
+
+    /**
      * Get a new date-only using the current system time for its value
      * @param {string | undefined} locale optional locale if provided
      * @returns {DateOnly} a new date-only using the current system time for its value
@@ -235,6 +315,8 @@ class DateOnly {
                 locale || dateOnly.locale
             );
         }
+        const dateValue = new Date(dateOnly);
+        if (isNaN(dateValue)) return this.invalid();
         return new DateOnly(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale);
     }
 
@@ -640,6 +722,18 @@ class DateOnly {
         };
     }
 
+    /**
+     * Return a debug string 
+     * @returns {string}
+     * @example
+     * ````javascript
+     * console.log(toDateOnly('2023-04-15').debug()); // Print: "DateOnly(2023-04-15)"
+     * ````
+     */
+    debug() {
+        return `DateOnly(${this.toJSON()})`;
+    }
+
     // MomentJs/Sequelize Compatibility layer
     get [Symbol.toStringTag]() {
         return 'Date';
@@ -647,7 +741,7 @@ class DateOnly {
 
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
-        return `DateOnly(${this.toJSON()})`;
+        return this.debug();
     }
 
     /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
