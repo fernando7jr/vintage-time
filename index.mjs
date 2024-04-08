@@ -1,4 +1,4 @@
-import {isMoment} from 'moment-timezone';
+import moment from 'moment-timezone';
 
 import {DateOnly} from './date-only.mjs';
 import {DateTime} from './date-time.mjs';
@@ -21,7 +21,7 @@ export {DateTime} from './date-time.mjs';
 export function getDateLocale(anyDate) {
     if (!anyDate) return undefined;
     else if (anyDate instanceof Date) return undefined;
-    else if (isMoment(anyDate)) return anyDate.locale();
+    else if (moment.isMoment(anyDate)) return anyDate.locale();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.locale;
     return undefined;
 }
@@ -34,7 +34,7 @@ export function getDateLocale(anyDate) {
 export function isDateValid(anyDate) {
     if (!anyDate) return false;
     else if (anyDate instanceof Date) return !isNaN(anyDate);
-    else if (isMoment(anyDate)) return anyDate.isValid();
+    else if (moment.isMoment(anyDate)) return anyDate.isValid();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.isValid;
     return toDateTime(anyDate).isValid;
 }
@@ -47,7 +47,7 @@ export function isDateValid(anyDate) {
 export function toJsDate(anyDate) {
     if (!anyDate) return undefined;
     else if (anyDate instanceof Date) return anyDate;
-    else if (isMoment(anyDate)) return anyDate.toDate();
+    else if (moment.isMoment(anyDate)) return anyDate.toDate();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.toJsDate();
     return toDateTime(anyDate).toJsDate();
 }
