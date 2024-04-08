@@ -309,7 +309,7 @@ class DateOnly {
             return new DateOnly(dateOnly._innerDate, locale);
         } else if (typeof dateOnly === 'string') {
             return new DateOnly(moment.tz(dateOnly, 'UTC'), locale);
-        } else if (typeof dateOnly === 'object') {
+        } else if (__isDateOnlyObject(dateOnly)) {
             const month = __getObjectValue(dateOnly.month);
             return new DateOnly(
                 moment.tz(

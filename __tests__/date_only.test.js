@@ -796,6 +796,23 @@ describe('DateOnly', () => {
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
+            it('should fallback to Object.toString method', () => {
+                const result = DateOnly.fromDateOnly({
+                    toString() {
+                        return '2020-02-01T00:00:00.000Z'
+                    }
+                });
+                expect(result).toBeInstanceOf(DateOnly);
+                expect(result.isDateOnly).toBe(true);
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 2,
+                    day: 1,
+                });
+                expect(result.toJSON()).toBe('2020-02-01');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+            });
+
             it('should thrown on unexpected DateOnly object', () => {
                 try {
                     DateOnly.fromDateOnly({
