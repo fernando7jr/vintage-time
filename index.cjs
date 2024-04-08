@@ -1,4 +1,4 @@
-const {isMoment} = require('moment-timezone');
+const moment = require('moment-timezone');
 
 const {DateOnly} = require('./date-only.cjs');
 const {DateTime} = require('./date-time.cjs');
@@ -18,7 +18,7 @@ const {LOCALE_FORMATS} = require('./locale-formats.cjs');
 function getDateLocale(anyDate) {
     if (!anyDate) return undefined;
     else if (anyDate instanceof Date) return undefined;
-    else if (isMoment(anyDate)) return anyDate.locale();
+    else if (moment.isMoment(anyDate)) return anyDate.locale();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.locale;
     return undefined;
 }
@@ -31,7 +31,7 @@ function getDateLocale(anyDate) {
 function isDateValid(anyDate) {
     if (!anyDate) return false;
     else if (anyDate instanceof Date) return !isNaN(anyDate);
-    else if (isMoment(anyDate)) return anyDate.isValid();
+    else if (moment.isMoment(anyDate)) return anyDate.isValid();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.isValid;
     return toDateTime(anyDate).isValid;
 }
@@ -44,7 +44,7 @@ function isDateValid(anyDate) {
 function toJsDate(anyDate) {
     if (!anyDate) return undefined;
     else if (anyDate instanceof Date) return anyDate;
-    else if (isMoment(anyDate)) return anyDate.toDate();
+    else if (moment.isMoment(anyDate)) return anyDate.toDate();
     else if (DateTime.isDateTime(anyDate) || DateOnly.isDateOnly(anyDate)) return anyDate.toJsDate();
     return toDateTime(anyDate).toJsDate();
 }
