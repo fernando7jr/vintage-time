@@ -46,7 +46,7 @@ const ISOWEEK_UNITS = new Set(['isoWeek', 'isoWeeks', 'W']);
  */
 function __isDateTime(value) {
     if (!value) return false;
-    return __isDateTimeObject(value);
+    return __isDateTimeObject(value, true);
 }
 
 function __getObjectValue(value) {
@@ -283,8 +283,16 @@ class DateOnly {
         if (typeof dateTime === 'string') {
             return new DateOnly(moment.tz(dateTime, 'UTC').startOf('day'), locale);
         } else if (__isDateTime(dateTime)) {
+            const month = __getObjectValue(dateTime.month);
             return new DateOnly(
-                moment.tz({year: dateTime.year, month: dateTime.month - 1, date: dateTime.day || dateTime.date}, 'UTC'),
+                moment.tz(
+                    {
+                        year: __getObjectValue(dateTime.year),
+                        month: month ? month - 1 : 0,
+                        date: __getObjectValue(dateTime.day) || __getObjectValue(dateTime.date) || 1,
+                    },
+                    'UTC'
+                ),
                 locale || dateTime.locale
             );
         }
@@ -307,8 +315,8 @@ class DateOnly {
                 moment.tz(
                     {
                         year: __getObjectValue(dateOnly.year),
-                        month: month ? month - 1 : undefined,
-                        date: __getObjectValue(dateOnly.day) || __getObjectValue(dateOnly.date),
+                        month: month ? month - 1 : 0,
+                        date: __getObjectValue(dateOnly.day) || __getObjectValue(dateOnly.date) || 1,
                     },
                     'UTC'
                 ),
@@ -627,7 +635,8 @@ class DateOnly {
     }
 
     /**
-     * Get the difference between two dates
+     * Get the difference between two dates.
+     * If any of the dates is invalid then an error is thrown.
      * @param {AnyDate} date any valid date value
      * @param {DiffUnit | undefined} unitOfTime optional unit of time for comparission. Defaults to millisecond
      * @param {boolean | undefined} precise when false an integer is returned rather than a decimal number
@@ -635,6 +644,7 @@ class DateOnly {
      */
     diff(date, unitOfTime, precise) {
         const dateOnly = DateOnly.fromAnyDate(date);
+        if (!this.isValid || !dateOnly.isValid) throw new Error(`Can not subtract "${this.toJSON()}" from "${dateOnly.toJSON()}"`);
         return this._innerDate.diff(dateOnly._innerDate, unitOfTime, precise);
     }
 
@@ -657,11 +667,13 @@ class DateOnly {
 
     /**
      * Return true when the date value is equal to this date-only.
-     * This checks the value.
+     * This checks the value. Invalid dates always return false.
      * @param anyDate any date value
      */
     equals(anyDate) {
+        if (!this.isValid) return false;
         const dateOnly = DateOnly.fromAnyDate(anyDate);
+        if (!dateOnly.isValid) return false;
         return this.valueOf() === dateOnly.valueOf();
     }
 

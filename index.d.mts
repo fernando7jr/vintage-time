@@ -3,7 +3,7 @@ import type {Moment, unitOfTime} from 'moment-timezone';
 import { LOCALE_FORMATS } from './locale-formats.mts';
 export { LOCALE_FORMATS } from './locale-formats.mts';
 
-export type AnyDate = Date | Moment | DateOnly | DateTime | DateOnlyLike | DateTimeLike | string | number;
+export type AnyDate = Date | Moment | DateOnly | DateTime | Partial<DateOnlyLike> | Partial<DateTimeLike> | string | number;
 
 export type DateOnlyLike = Pick<DateOnly, 'year' | 'month' | 'day'>;
 export type DiffUnit = unitOfTime.Diff;
@@ -168,14 +168,14 @@ export class DateOnly {
      * @param dateTime any date-time object
      * @param locale optional locale if provided
      */
-    static fromDateTime(dateTime: DateTime | DateTimeLike, locale?: string): DateOnly;
+    static fromDateTime(dateTime: DateTime | Partial<DateTimeLike>, locale?: string): DateOnly;
 
     /**
      * Construct a new date-only from a DateOnly isntance
      * @param dateOnly any date-only like object
      * @param locale optional locale if provided
      */
-    static fromDateOnly(dateOnly: DateOnly | DateOnlyLike, locale?: string): DateOnly;
+    static fromDateOnly(dateOnly: DateOnly | Partial<DateOnlyLike>, locale?: string): DateOnly;
 
     /**
      * Construct a new date-only from any valid date value.
@@ -412,7 +412,8 @@ export class DateOnly {
     minus(amount: number, unitOfTime: DateOnlySubtractUnit): DateOnly;
 
     /**
-     * Get the difference between two dates
+     * Get the difference between two dates.
+     * If any of the dates is invalid then an error is thrown.
      * @param date any valid date value
      * @param unitOfTime optional unit of time for comparission. Defaults to millisecond
      * @param precise when false an integer is returned rather than a decimal number
@@ -651,14 +652,14 @@ export class DateTime {
      * @param dateTime any date-time object
      * @param locale optional locale if provided
      */
-    static fromDateTime(dateTime: DateTime, locale?: string): DateTime;
+    static fromDateTime(dateTime: DateTime | Partial<DateTimeLike>, locale?: string): DateTime;
 
     /**
      * Construct a new date-time from a DateOnly isntance
      * @param dateOnly any date-only object
      * @param locale optional locale if provided
      */
-    static fromDateOnly(dateOnly: DateOnly, locale?: string): DateTime;
+    static fromDateOnly(dateOnly: DateOnly | Partial<DateOnlyLike>, locale?: string): DateTime;
 
     /**
      * Construct a new date-time from any valid date value
@@ -952,7 +953,8 @@ export class DateTime {
     minus(amount: number, unitOfTime: DateTimeSubtractUnit): DateTime;
 
     /**
-     * Get the difference between two dates
+     * Get the difference between two dates.
+     * If any of the dates is invalid then an error is thrown.
      * @param anyDate any valid date value
      * @param unitOfTime optional unit of time for comparission. Defaults to millisecond
      * @param precise when false an integer is returned rather than a decimal number
@@ -975,7 +977,7 @@ export class DateTime {
 
     /**
      * Return true when the date value is equal to this date-time.
-     * This checks the value.
+     * This checks the value. Invalid dates always return false.
      * @param anyDate any date value
      */
     equals(anyDate: AnyDate): boolean;

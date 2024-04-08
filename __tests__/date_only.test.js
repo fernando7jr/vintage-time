@@ -1312,6 +1312,31 @@ describe('DateOnly', () => {
                 expect(dateOnly.toString()).not.toEqual(dateString);
             });
         });
+
+        describe('isUTC', () => {
+            it('should always return true', () => {
+                const values = [DateOnly.now(), DateOnly.invalid(), DateOnly.fromAnyDate('2025-12-17')];
+                expect(values.map((v) => v.isUTC)).toEqual(values.map(() => true));
+            });
+        });
+
+        describe('isLeapYear', () => {
+            const leapYears = [2000, 2004, 2008, 2012, 2016, 2020, 2024, 2028, 2032, 2036, 2040, 2044, 2048];
+
+            it('should return true for leap years', () => {
+                expect(leapYears.map((y) => toDateOnly({year: y}).isLeapYear)).toEqual(leapYears.map(() => true));
+            });
+
+            it('should return false for non leap years', () => {
+                const leapYearsSet = new Set(leapYears);
+                const dates = [];
+                for (let y = 2001; y < 2048; y += 1) {
+                    if (leapYearsSet.has(y)) continue;
+                    dates.push(toDateOnly({year: y}));
+                }
+                expect(dates.map((d) => d.isLeapYear)).toEqual(dates.map(() => false));
+            });
+        });
     });
 
     describe('methods', () => {
@@ -1510,6 +1535,84 @@ describe('DateOnly', () => {
                 const date = toDateOnly('2023-04-15');
                 expect(date.debug()).toBe('DateOnly(2023-04-15)');
                 expect(date[Symbol.for('nodejs.util.inspect.custom')]()).toBe('DateOnly(2023-04-15)');
+            });
+        });
+
+        describe('clone', () => {
+            it('should clone and return another instance with the same values', () => {
+                const date = toDateOnly('2023-04-15');
+                const clonedDate = date.clone();
+                expect(date === clonedDate).toBe(false);
+                expect(date.valueOf()).toEqual(clonedDate.valueOf());
+                expect(date.toObject()).toEqual(clonedDate.toObject());
+                expect(date.toString()).toEqual(clonedDate.toString());
+                expect(date.equals(clonedDate)).toBe(true);
+            });
+
+            it('should also work with invalid dates', () => {
+                const date = DateOnly.invalid();
+                const clonedDate = date.clone();
+                expect(date === clonedDate).toBe(false);
+                expect(date.valueOf()).toEqual(clonedDate.valueOf());
+                expect(date.toObject()).toEqual(clonedDate.toObject());
+                expect(date.toString()).toEqual(clonedDate.toString());
+                expect(date.equals(clonedDate)).toBe(false);
+            });
+        });
+
+        describe('equals', () => {
+            it('should check the valueOf for equality', () => {
+                const date = toDateOnly('2023-04-15');
+                const clonedDate = date.clone();
+                expect(date.equals(clonedDate)).toBe(true);
+            });
+
+            it('should return false if any of the dates are invalid', () => {
+                const date = toDateOnly('2023-04-15');
+                const invalidDate = DateOnly.invalid();
+                expect(date.equals(invalidDate)).toBe(false);
+                expect(invalidDate.equals(date)).toBe(false);
+                expect(invalidDate.equals(invalidDate)).toBe(false);
+            });
+        });
+
+        describe('diff', () => {
+            const dateA = toDateOnly('2024-01-01');
+            const dateB = toDateOnly('2024-02-03');
+            const properties = {
+                year: Math.abs(dateA.year - dateB.year),
+                month: Math.abs(dateA.month - dateB.month),
+                day: Math.abs(dateA.dayOfYear - dateB.dayOfYear),
+                week: Math.abs(dateA.week - dateB.week),
+                quarter: Math.abs(dateA.quarter - dateB.quarter),
+            };
+    
+            it.each(Object.keys(properties))('should get the difference in %ss', (prop) => {
+                const diffAmount = properties[prop];
+                expect(dateA.diff(dateB, prop)).toEqual(!diffAmount ? 0 : -diffAmount);
+                expect(dateB.diff(dateA, prop)).toEqual(diffAmount);
+            });
+
+            it('should get the precise difference', () => {
+                const diffObj = {
+                    year: dateB.diff(dateA, 'year', true),
+                    month: dateB.diff(dateA, 'month', true),
+                    day: dateB.diff(dateA, 'day', true),
+                    week: dateB.diff(dateA, 'week', true),
+                    quarter: dateB.diff(dateA, 'quarter', true),
+                };
+                expect(diffObj.year).toEqual(0.08870967741935483);
+                expect(diffObj.month).toEqual(1.064516129032258);
+                expect(diffObj.day).toEqual(33);
+                expect(diffObj.week).toEqual(4.714285714285714);
+                expect(diffObj.quarter).toEqual(0.3548387096774193);
+            });
+
+            it('should throw if any of the dates is invalid', () => {
+                const invalidDate = DateOnly.invalid();
+                expect(() => dateA.diff(invalidDate, 'year')).toThrow('Can not subtract "2024-01-01" from "Invalid date"');
+                expect(() => invalidDate.diff(dateA, 'year')).toThrow('Can not subtract "Invalid date" from "2024-01-01"');
+                expect(() => invalidDate.diff(invalidDate, 'year')).toThrow('Can not subtract "Invalid date" from "Invalid date"');
             });
         });
     });
