@@ -677,15 +677,17 @@ export class DateTime {
     }
 
     /**
-     * Get the difference between two dates
+     * Get the difference between two dates.
+     * If any of the dates is invalid then an error is thrown.
      * @param {AnyDate} date any valid date value
      * @param {DiffUnit | undefined} unitOfTime optional unit of time for comparission. Defaults to millisecond
      * @param {boolean | undefined} precise when false an integer is returned rather than a decimal number
      * @returns {number} the difference
      */
     diff(date, unitOfTime, precise) {
-        const dateOnly = DateTime.fromAnyDate(date);
-        return this._innerDate.diff(dateOnly._innerDate, unitOfTime, precise);
+        const dateTime = DateTime.fromAnyDate(date);
+        if (!this.isValid || !dateTime.isValid) throw new Error(`Can not subtract "${this.toJSON()}" from "${dateTime.toJSON()}"`);
+        return this._innerDate.diff(dateTime._innerDate, unitOfTime, precise);
     }
 
     /**
@@ -707,12 +709,14 @@ export class DateTime {
 
     /**
      * Return true when the date value is equal to this date-time.
-     * This checks the value.
-     * @param {AnyDate} anyDate any date value
+     * This checks the value. Invalid dates always return false.
+     * @param anyDate any date value
      */
     equals(anyDate) {
-        const dateTime = DateTime.fromAnyDate(anyDate);
-        return this.valueOf() === dateTime.valueOf();
+        if (!this.isValid) return false;
+        const dateOnly = DateTime.fromAnyDate(anyDate);
+        if (!dateOnly.isValid) return false;
+        return this.valueOf() === dateOnly.valueOf();
     }
 
    /**

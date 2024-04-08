@@ -2180,6 +2180,24 @@ describe('DateTime', () => {
                 expect(dateTime.toString()).not.toEqual(dateString);
             });
         });
+
+        describe('isLeapYear', () => {
+            const leapYears = [2000, 2004, 2008, 2012, 2016, 2020, 2024, 2028, 2032, 2036, 2040, 2044, 2048];
+
+            it('should return true for leap years', () => {
+                expect(leapYears.map((y) => toDateTime({year: y}).isLeapYear)).toEqual(leapYears.map(() => true));
+            });
+
+            it('should return false for non leap years', () => {
+                const leapYearsSet = new Set(leapYears);
+                const dates = [];
+                for (let y = 2001; y < 2048; y += 1) {
+                    if (leapYearsSet.has(y)) continue;
+                    dates.push(toDateTime({year: y}));
+                }
+                expect(dates.map((d) => d.isLeapYear)).toEqual(dates.map(() => false));
+            });
+        });
     });
 
     describe('methods', () => {
@@ -2588,6 +2606,108 @@ describe('DateTime', () => {
                 date = toDateTime('2023-04-15T22:13:14.333Z');
                 expect(date.debug()).toBe('DateTime(2023-04-15 22:13:14.333Z)');
                 expect(date[Symbol.for('nodejs.util.inspect.custom')]()).toBe('DateTime(2023-04-15 22:13:14.333Z)');
+            });
+        });
+
+        describe('clone', () => {
+            it('should clone and return another instance with the same values', () => {
+                const date = toDateTime('2023-04-15');
+                const clonedDate = date.clone();
+                expect(date === clonedDate).toBe(false);
+                expect(date.valueOf()).toEqual(clonedDate.valueOf());
+                expect(date.toObject()).toEqual(clonedDate.toObject());
+                expect(date.toString()).toEqual(clonedDate.toString());
+                expect(date.equals(clonedDate)).toBe(true);
+            });
+
+            it('should also work with invalid dates', () => {
+                const date = DateTime.invalid();
+                const clonedDate = date.clone();
+                expect(date === clonedDate).toBe(false);
+                expect(date.valueOf()).toEqual(clonedDate.valueOf());
+                expect(date.toObject()).toEqual(clonedDate.toObject());
+                expect(date.toString()).toEqual(clonedDate.toString());
+                expect(date.equals(clonedDate)).toBe(false);
+            });
+        });
+
+        describe('equals', () => {
+            it('should check the valueOf for equality', () => {
+                const date = toDateTime('2023-04-15');
+                const clonedDate = date.clone();
+                expect(date.equals(clonedDate)).toBe(true);
+            });
+
+            it('should return false if any of the dates are invalid', () => {
+                const date = toDateTime('2023-04-15');
+                const invalidDate = DateTime.invalid();
+                expect(date.equals(invalidDate)).toBe(false);
+                expect(invalidDate.equals(date)).toBe(false);
+                expect(invalidDate.equals(invalidDate)).toBe(false);
+            });
+        });
+
+        describe('diff', () => {
+            const dateA = toDateTime('2024-01-01T00:00:00.000Z');
+            const dateB = toDateTime('2024-02-03T07:23:44.333Z');
+            const dateProperties = {
+                year: Math.abs(dateA.year - dateB.year),
+                month: Math.abs(dateA.month - dateB.month),
+                day: Math.abs(dateA.dayOfYear - dateB.dayOfYear),
+                week: Math.abs(dateA.week - dateB.week),
+                quarter: Math.abs(dateA.quarter - dateB.quarter),
+            };
+    
+            it.each(Object.keys(dateProperties))('should get the difference in %ss', (prop) => {
+                const diffAmount = dateProperties[prop];
+                expect(dateA.diff(dateB, prop)).toEqual(!diffAmount ? 0 : -diffAmount);
+                expect(dateB.diff(dateA, prop)).toEqual(diffAmount);
+            });
+            it('should get the time difference', () => {
+                const diffObj = {
+                    hour: dateB.diff(dateA, 'hour'),
+                    minute: dateB.diff(dateA, 'minute'),
+                    second: dateB.diff(dateA, 'second'),
+                    millisecond: dateB.diff(dateA, 'millisecond'),
+                };
+                expect(diffObj).toEqual({
+                    hour: 799,
+                    minute: 47963,
+                    second: 2877824,
+                    millisecond: 2877824333,
+                });
+            });
+
+            it('should get the precise difference', () => {
+                const diffObj = {
+                    year: dateB.diff(dateA, 'year', true),
+                    month: dateB.diff(dateA, 'month', true),
+                    day: dateB.diff(dateA, 'day', true),
+                    week: dateB.diff(dateA, 'week', true),
+                    quarter: dateB.diff(dateA, 'quarter', true),
+                    hour: dateB.diff(dateA, 'hour', true),
+                    minute: dateB.diff(dateA, 'minute', true),
+                    second: dateB.diff(dateA, 'second', true),
+                    millisecond: dateB.diff(dateA, 'millisecond', true),
+                };
+                expect(diffObj).toEqual({
+                    year: 0.08953804301697531,
+                    month: 1.0744565162037036,
+                    day: 33.30815200231481,
+                    week: 4.758307428902117,
+                    quarter: 0.35815217206790123,
+                    hour: 799.3956480555555,
+                    minute: 47963.73888333333,
+                    second: 2877824.333,
+                    millisecond: 2877824333,
+                });
+            });
+
+            it('should throw if any of the dates is invalid', () => {
+                const invalidDate = DateTime.invalid();
+                expect(() => dateA.diff(invalidDate, 'year')).toThrow('Can not subtract "2024-01-01T00:00:00.000Z" from "Invalid date"');
+                expect(() => invalidDate.diff(dateA, 'year')).toThrow('Can not subtract "Invalid date" from "2024-01-01T00:00:00.000Z"');
+                expect(() => invalidDate.diff(invalidDate, 'year')).toThrow('Can not subtract "Invalid date" from "Invalid date"');
             });
         });
     });
