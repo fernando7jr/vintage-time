@@ -1,6 +1,6 @@
 {
     "name": "vintage-time",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "description": "DateTime x DateOnly library with locale support. Compatible with sequelize, joi, momentjs and plain javascript Dates",
     "type": "commonjs",
     "main": "index.cjs",
