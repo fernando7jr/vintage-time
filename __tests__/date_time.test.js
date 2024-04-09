@@ -2710,6 +2710,53 @@ describe('DateTime', () => {
                 expect(() => invalidDate.diff(invalidDate, 'year')).toThrow('Can not subtract "Invalid date" from "Invalid date"');
             });
         });
+
+        describe('set', () => {
+            it('should set a duration object', () => {
+                const dateTime = toDateTime('2029-08-23T00:00:00.000Z');
+                const result = dateTime.set({days: 7, month: 1, hours: 2});
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 1,
+                    day: 7,
+                    hour: 2,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                    timezone: UTC_TZ,
+                    offset: UTC_TZ_OFFSET,
+                });
+                expect(result.equals(dateTime)).toBe(true);
+            });
+
+            it('should set a value for a given unit', () => {
+                const dateTime = toDateTime('2029-08-23T00:00:00.000Z');
+                let result = dateTime.set(7, 'days').set(3, 'seconds');
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 7,
+                    hour: 0,
+                    minute: 0,
+                    second: 3,
+                    millisecond: 0,
+                    timezone: UTC_TZ,
+                    offset: UTC_TZ_OFFSET,
+                });
+                expect(result.equals(dateTime)).toBe(true);
+            });
+
+            it('should have no effect if the unit is invalid or unhandled', () => {
+                const dateTime = toDateTime('2029-08-23T05:44:00.000Z');
+                const dateObj = dateTime.toObject();
+                let result = dateTime.set(7, null);
+                expect(result.equals(dateTime)).toBe(true);
+                expect(result.toObject()).toEqual(dateObj);
+                result = dateTime.plus({offset: 9});
+                expect(result.equals(dateTime)).toBe(true);
+                expect(result.toObject()).toEqual(dateObj);
+            });
+        });
     });
 
     describe('compatibility', () => {
@@ -2732,6 +2779,16 @@ describe('DateTime', () => {
             expect(jsDate instanceof DateTime).toBe(false);
             expect(DateTime.isDateTime(jsDate)).toBe(false);
             expect(jsDate.toISOString()).toEqual(dateTime.toISOString(true));
+        });
+
+        it('should contain replace, startsWith and endsWith methods which are used by sequelize', () => {
+            const dateTime = DateTime.now();
+            const dateString = dateTime.toJSON();
+            expect(dateTime.replace('\'', '')).toEqual(dateString);
+            expect(dateTime.startsWith(dateString)).toBe(true);
+            expect(dateTime.startsWith(dateString[0])).toBe(true);
+            expect(dateTime.endsWith(dateString)).toBe(true);
+            expect(dateTime.endsWith(dateString.at(-1))).toBe(true);
         });
     });
 });
