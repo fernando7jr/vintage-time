@@ -813,4 +813,19 @@ export class DateTime {
     getTime() {
         return this.toTimestamp();
     }
+
+    /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */
+    replace(regex, replacement) {
+        return this.toJSON().replace(regex, replacement);
+    }
+
+    /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */
+    startsWith(value) {
+        return this.toJSON().startsWith(value);
+    }
+
+    /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */
+    endsWith(value) {
+        return this.toJSON().endsWith(value);
+    }
 }

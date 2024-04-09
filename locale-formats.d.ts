@@ -19,4 +19,4 @@ export enum LOCALE_FORMATS {
     VERBAL_DATE_TIME_WEEKDAY_SHORT = 'llll',
     /** example for English `Thursday, September 4, 1986 8:30 PM` */
     VERBAL_DATE_TIME_WEEKDAY_LONG = 'LLLL',
-};
+}
