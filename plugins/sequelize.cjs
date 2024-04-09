@@ -1,17 +1,28 @@
 const {DataTypes} = require('sequelize');
+const {SequelizeMethod} = require('sequelize/lib/utils');
 
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
+
+/** @returns {value is SequelizeMethod} */
+function isSequelizeMethod(value) {
+    return value instanceof SequelizeMethod;
+}
 
 function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
     return {
         get() {
             const value = this.getDataValue(propertyName);
-            if (!value) return null;
+
+            if (isSequelizeMethod(value)) return value;
+            else if (!value) return null;
+
             return DateOnly.fromAnyDate(value);
         },
         set(value) {
-            if (value === null || value === undefined) {
+            if (isSequelizeMethod(value)) {
+                return;
+            } else if (value === null || value === undefined) {
                 this.setDataValue(propertyName, null);
                 return;
             }
@@ -49,11 +60,16 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
     return {
         get() {
             const value = this.getDataValue(propertyName);
-            if (!value) return null;
+            
+            if (isSequelizeMethod(value)) return value;
+            else if (!value) return null;
+
             return DateTime.fromAnyDate(value);
         },
         set(value) {
-            if (value === null || value === undefined) {
+            if (isSequelizeMethod(value)) {
+                return;
+            } else if (value === null || value === undefined) {
                 this.setDataValue(propertyName, null);
                 return;
             }

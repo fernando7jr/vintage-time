@@ -1,5 +1,6 @@
 const {randomUUID} = require('crypto');
 const {Sequelize, DataTypes} = require('sequelize');
+const {SequelizeMethod} = require('sequelize/lib/utils');
 
 const {DateOnly} = require('../../date-only.cjs');
 const {DateTime} = require('../../date-time.cjs');
@@ -11,8 +12,10 @@ describe('Date sequelize utils', () => {
     /** @typedef {Omit<DateDummy, 'id' | 'expiredAt' | 'storedAt'>} DateDummyCreationAttributes */
     /** @type {import('sequelize').ModelStatic<import('sequelize').Model<DateDummy, DateDummyCreationAttributes>>} */
     let model;
-    /** @type {import('sequelize').ModelStatic<import('sequelize').Model<DateDummy, DateDummyCreationAttributes>>} */
+    /** @type {typeof model} */
     let modelStrict;
+    /** @type {typeof model} */
+    let modelWithSequelizeMethod;
     /** @type {Sequelize} */
     let sequelize;
     beforeAll(async () => {
@@ -50,8 +53,10 @@ describe('Date sequelize utils', () => {
             }
         );
 
+        await sequelize.sync();
+
         modelStrict = sequelize.define(
-            'DateDummy',
+            'DateDummy2',
             {
                 id: {
                     type: DataTypes.SMALLINT,
@@ -73,12 +78,39 @@ describe('Date sequelize utils', () => {
                 },
             },
             {
-                tableName: 'dummies',
+                tableName: 'dummies_2',
                 paranoid: false,
             }
         );
 
-        await sequelize.sync();
+        modelWithSequelizeMethod = sequelize.define(
+            'DateDummy3',
+            {
+                id: {
+                    type: DataTypes.SMALLINT,
+                    autoIncrement: true,
+                    primaryKey: true,
+                },
+                label: {
+                    type: DataTypes.STRING(20),
+                    allowNull: false,
+                },
+                expiredAt: {
+                    ...dateOnlyColumn('expiredAt'),
+                    allowNull: true,
+                    defaultValue: sequelize.literal('NULL'),
+                },
+                storedAt: {
+                    ...dateTimeColumn('storedAt'),
+                    allowNull: false,
+                    defaultValue: sequelize.literal("strftime('%Y-%m-%d','now')"),
+                },
+            },
+            {
+                tableName: 'dummies_3',
+                paranoid: false,
+            }
+        );
     });
 
     afterAll(async () => {
@@ -238,6 +270,20 @@ describe('Date sequelize utils', () => {
         expect(instance.storedAt).toBeNull();
         instance.storedAt = undefined;
         expect(instance.storedAt).toBeNull();
+    });
+
+    it('should do nothing when handling sequelize-method (literal, fn, ...)', () => {
+        const label = randomUUID();
+        const instance = new modelWithSequelizeMethod({
+            label,
+        });
+
+        expect(instance.expiredAt).toBeInstanceOf(SequelizeMethod);
+        instance.expiredAt = sequelize.literal('\'2020-01-01\'');
+        expect(instance.expiredAt).toBeInstanceOf(SequelizeMethod);
+        expect(instance.storedAt).toBeInstanceOf(SequelizeMethod);
+        instance.storedAt = sequelize.literal('\'2020-01-01\'');
+        expect(instance.storedAt).toBeInstanceOf(SequelizeMethod);
     });
 
     it('should fail to set properties when date value is invalid', () => {
