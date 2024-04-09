@@ -644,6 +644,48 @@ export class DateOnly {
     }
 
     /**
+     * Set a duration to this date and return the same DateOnly instance.
+     * Changes are performed in place.
+     * @param {Duration | number} amountOrDuration durtion object or numeric amount when used along an unit of time
+     * @param {AddUnit | undefined} unitOfTime optional unit if used along an amount instead of duration object
+     * @returns {this} this DateOny after changes
+     * @example ```javascript
+     * const dateOnly = toDateOnly('2023-01-01');
+     *
+     * // You can use the old form
+     * dateOnly.set(1, 'day');
+     * console.log(dateOnly.format()); // '2023-01-02'
+     *
+     * // Or pass a duration object
+     * dateOnly.set({day: 1});
+     * console.log(dateOnly.format()); // '2023-01-02'
+     * dateOnly.set({days: 2, momths: 3});
+     * console.log(dateOnly.format()); // '2023-04-03'
+     * ```
+     */
+    set(amountOrDuration, unitOfTime) {
+        if (!isNaN(amountOrDuration)) {
+            if (unitOfTime) return this.set({[unitOfTime]: amountOrDuration});
+        }
+
+        const DATE_KEYS = new Set(['day', 'days']);
+        const MONTH_KEYS = new Set(['month','months', 'M']);
+        const duration = {};
+        for (const sourceKey in amountOrDuration) {
+            let targetKey = sourceKey;
+            if (DATE_KEYS.has(sourceKey.toLowerCase())) targetKey = 'date';
+            else if (!this.#resolveUnitOfTime(sourceKey, {allowDays: true})) continue;
+            
+            let amount = amountOrDuration?.[sourceKey];
+            if (MONTH_KEYS.has(targetKey)) amount -= 1;
+            duration[targetKey] = amount;
+        }
+
+        this._innerDate.set(duration);
+        return this;
+    }
+
+    /**
      * Get the difference between two dates.
      * If any of the dates is invalid then an error is thrown.
      * @param {AnyDate} date any valid date value

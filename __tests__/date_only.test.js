@@ -1632,6 +1632,41 @@ describe('DateOnly', () => {
                 expect(() => invalidDate.diff(invalidDate, 'year')).toThrow('Can not subtract "Invalid date" from "Invalid date"');
             });
         });
+
+        describe('set', () => {
+            it('should set a duration object', () => {
+                const dateOnly = toDateOnly('2029-08-23');
+                const result = dateOnly.set({days: 7, month: 1});
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 1,
+                    day: 7,
+                });
+                expect(result.equals(dateOnly)).toBe(true);
+            });
+
+            it('should set a value for a given unit', () => {
+                const dateOnly = toDateOnly('2029-08-23');
+                const result = dateOnly.set(7, 'days');
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 7,
+                });
+                expect(result.equals(dateOnly)).toBe(true);
+            });
+
+            it('should have no effect if the unit is invalid or unhandled', () => {
+                const dateOnly = toDateOnly('2029-08-23');
+                const dateObj = dateOnly.toObject();
+                let result = dateOnly.set(7, null);
+                expect(result.equals(dateOnly)).toBe(true);
+                expect(result.toObject()).toEqual(dateObj);
+                result = dateOnly.plus({clocks: 9});
+                expect(result.equals(dateOnly)).toBe(true);
+                expect(result.toObject()).toEqual(dateObj);
+            });
+        });
     });
 
     describe('compatibility', () => {
@@ -1658,6 +1693,16 @@ describe('DateOnly', () => {
             expect({year: jsDate.getFullYear(), month: jsDate.getMonth() + 1, day: jsDate.getDate()}).toEqual(
                 dateOnly.toObject()
             );
+        });
+        
+        it('should contain replace, startsWith and endsWith methods which are used by sequelize', () => {
+            const dateOnly = DateOnly.now();
+            const dateString = dateOnly.toJSON();
+            expect(dateOnly.replace('\'', '')).toEqual(dateString);
+            expect(dateOnly.startsWith(dateString)).toBe(true);
+            expect(dateOnly.startsWith(dateString[0])).toBe(true);
+            expect(dateOnly.endsWith(dateString)).toBe(true);
+            expect(dateOnly.endsWith(dateString.at(-1))).toBe(true);
         });
     });
 });

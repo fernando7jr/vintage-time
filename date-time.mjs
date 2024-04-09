@@ -677,6 +677,47 @@ export class DateTime {
     }
 
     /**
+     * Set a duration to this date and return the same DateTime instance.
+     * Changes are performed in place.
+     * @param {Duration | number} amountOrDuration durtion object or numeric amount when used along an unit of time
+     * @param {AddUnit | undefined} unitOfTime optional unit if used along an amount instead of duration object
+     * @returns {this} this DateOny after changes
+     * @example ```javascript
+     * const dateTime = toDateTime('2023-01-01T00:00:00.000Z');
+     *
+     * // You can use the old form
+     * dateTime.set(1, 'day');
+     * console.log(dateTime.format()); // '2023-01-02T00:00:00.000Z'
+     *
+     * // Or pass a duration object
+     * dateTime.set({day: 1, hours: 4});
+     * console.log(dateTime.format()); // '2023-01-02T04:00:00.000Z'
+     * dateTime.set({days: 2, momths: 3});
+     * console.log(dateTime.format()); // '2023-04-03T00:00:00.000Z'
+     * ```
+     */
+    set(amountOrDuration, unitOfTime) {
+        if (!isNaN(amountOrDuration)) {
+            if (unitOfTime) return this.set({[unitOfTime]: amountOrDuration});
+        }
+
+        const DATE_KEYS = new Set(['day', 'days']);
+        const MONTH_KEYS = new Set(['month','months', 'M']);
+        const duration = {};
+        for (const sourceKey in amountOrDuration) {
+            let targetKey = sourceKey;
+            if (DATE_KEYS.has(sourceKey.toLowerCase())) targetKey = 'date';
+            
+            let amount = amountOrDuration?.[sourceKey];
+            if (MONTH_KEYS.has(targetKey)) amount -= 1;
+            duration[targetKey] = amount;
+        }
+
+        this._innerDate.set(duration);
+        return this;
+    }
+
+    /**
      * Get the difference between two dates.
      * If any of the dates is invalid then an error is thrown.
      * @param {AnyDate} date any valid date value
