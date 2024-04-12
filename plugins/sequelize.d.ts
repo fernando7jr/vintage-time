@@ -2,6 +2,22 @@ import {DataTypes} from 'sequelize';
 
 import {DateTime, DateOnly} from '../index.cts';
 
+export class DateOnlyDataType extends DataTypes.ABSTRACT {
+    static readonly key: 'VINTAGE_DATEONLY';
+
+    toSql(): string;
+
+    stringify(date): string;
+}
+
+export class DateTimeDataType extends DataTypes.ABSTRACT {
+    static readonly key: 'VINTAGE_DATETIME';
+
+    toSql(): string;
+
+    stringify(date): string;
+}
+
 /**
  * Get sequelize DATEONLY type properties
  * It includes getter and setter since DATEONLY in sequelize only accepts javascript Date objects but returns string on fetch
@@ -28,10 +44,10 @@ import {DateTime, DateOnly} from '../index.cts';
  * ````
  */
 export function dateOnlyColumn(propertyName: string, strict?: boolean): {
-    type: typeof DataTypes.DATEONLY,
+    type: DateOnlyDataType,
     get(): DateOnly | null;
     set(value: any): void;
-}
+};
 
 /**
  * Get sequelize DATETIME type properties
@@ -58,7 +74,7 @@ export function dateOnlyColumn(propertyName: string, strict?: boolean): {
  * ````
  */
 export function dateTimeColumn(propertyName: string, strict?: boolean): {
-    type: typeof DataTypes.DATE,
+    type: DateTimeDataType,
     get(): DateTime | null;
     set(value: any): void;
 };

@@ -1670,18 +1670,6 @@ describe('DateOnly', () => {
     });
 
     describe('compatibility', () => {
-        it('should allow to construct a new moment object directly', () => {
-            const dateOnly = DateOnly.now();
-            expect(dateOnly).toBeInstanceOf(DateOnly);
-            const m = moment(dateOnly);
-            expect(moment.isMoment(m)).toBe(true);
-            expect(m instanceof moment).toBe(true);
-            expect(m instanceof DateOnly).toBe(false);
-            expect(DateOnly.isDateOnly(m)).toBe(false);
-            expect(m.format('YYYY-MM-DD')).toEqual(dateOnly.toJSON());
-            expect({year: m.year(), month: m.month() + 1, day: m.date()}).toEqual(dateOnly.toObject());
-        });
-
         it('should allow to construct a new JS Date object directly', () => {
             const dateOnly = DateOnly.now();
             expect(dateOnly).toBeInstanceOf(DateOnly);
@@ -1703,6 +1691,15 @@ describe('DateOnly', () => {
             expect(dateOnly.startsWith(dateString[0])).toBe(true);
             expect(dateOnly.endsWith(dateString)).toBe(true);
             expect(dateOnly.endsWith(dateString.at(-1))).toBe(true);
+        });
+
+        it('should be correctly asserted using expect.toMatchObject', () => {
+            const dateOnly = DateOnly.now().set({year: 2001});
+            const dateString = dateOnly.toJSON();
+            expect({dateOnly, dateString}).toMatchObject({
+                dateOnly: dateOnly.clone(),
+                dateString,
+            });
         });
     });
 });

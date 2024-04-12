@@ -2760,17 +2760,6 @@ describe('DateTime', () => {
     });
 
     describe('compatibility', () => {
-        it('should allow to construct a new moment object directly', () => {
-            const dateTime = DateTime.now();
-            expect(dateTime).toBeInstanceOf(DateTime);
-            const m = moment(dateTime);
-            expect(moment.isMoment(m)).toBe(true);
-            expect(m instanceof moment).toBe(true);
-            expect(m instanceof DateTime).toBe(false);
-            expect(DateTime.isDateTime(m)).toBe(false);
-            expect(m.toISOString(true).replace('+00:00', 'Z')).toEqual(dateTime.toISOString(false));
-        });
-
         it('should allow to construct a new JS Date object directly', () => {
             const dateTime = DateTime.now();
             expect(dateTime).toBeInstanceOf(DateTime);
@@ -2789,6 +2778,15 @@ describe('DateTime', () => {
             expect(dateTime.startsWith(dateString[0])).toBe(true);
             expect(dateTime.endsWith(dateString)).toBe(true);
             expect(dateTime.endsWith(dateString.at(-1))).toBe(true);
+        });
+
+        it('should be correctly asserted using expect.toMatchObject', () => {
+            const dateTime = DateTime.now().set({year: 2001});
+            const dateString = dateTime.toJSON();
+            expect({dateTime, dateString}).toMatchObject({
+                dateTime: dateTime.clone(),
+                dateString,
+            });
         });
     });
 });

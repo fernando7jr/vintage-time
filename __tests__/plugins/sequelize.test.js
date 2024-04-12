@@ -222,7 +222,7 @@ describe('Date sequelize utils', () => {
             {
                 label,
                 expiredAt: toDateOnly('2023-07-19'),
-                storedAt: toDateTime('2022-11-29'),
+                storedAt: toDateTime('2022-11-29T00:30:44.000-10:00'),
             },
             {
                 label,

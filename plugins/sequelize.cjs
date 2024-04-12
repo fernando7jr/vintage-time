@@ -1,8 +1,57 @@
-const {DataTypes} = require('sequelize');
+const {DataTypes, Utils} = require('sequelize');
 const {SequelizeMethod} = require('sequelize/lib/utils');
 
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
+
+class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
+    static get key() {
+        return 'VINTAGE_DATETIME'
+    }
+
+    constructor(...args) {
+        super(...args);
+    }
+
+    toSql() {
+        return 'DATE';
+    }
+
+    _stringify(date) {
+        return DateOnly.fromAnyDate(date).toJSON();
+    }
+
+    stringify(date) {
+        return this._stringify(date);
+    }
+}
+
+class DateTimeDataType extends DataTypes.ABSTRACT.prototype.constructor {
+    static get key() {
+        return 'VINTAGE_DATETIME'
+    }
+
+    constructor(...args) {
+        super(...args);
+    }
+
+    toSql() {
+        return 'DATETIME';
+    }
+
+    _stringify(date) {
+        return DateTime.fromAnyDate(date).toJSON().replace(/Z$/, '+00:00');
+    }
+
+    stringify(date) {
+        return this._stringify(date);
+    }
+}
+
+DataTypes.VINTAGE_DATEONLY = Utils.classToInvokable(DateOnlyDataType);
+DataTypes.VINTAGE_DATEONLY.prototype.key = DataTypes.VINTAGE_DATEONLY.key;
+DataTypes.VINTAGE_DATETIME = Utils.classToInvokable(DateTimeDataType);
+DataTypes.VINTAGE_DATETIME.prototype.key = DataTypes.VINTAGE_DATETIME.key;
 
 /** @returns {value is SequelizeMethod} */
 function isSequelizeMethod(value) {
@@ -51,7 +100,7 @@ function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
  */
 function dateOnlyColumn(propertyName, strict = false) {
     return {
-        type: DataTypes.DATEONLY,
+        type: DateOnlyDataType,
         ...dateOnlyColumnGetterSetter(propertyName, strict),
     };
 }
@@ -96,9 +145,9 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
  */
 function dateTimeColumn(propertyName, strict = false) {
     return {
-        type: DataTypes.DATE,
+        type: DateTimeDataType,
         ...dateTimeColumnGetterSetter(propertyName, strict),
     };
 }
 
-module.exports = {dateOnlyColumn, dateTimeColumn};
+module.exports = {dateOnlyColumn, dateTimeColumn, DateOnlyDataType, DateTimeDataType};
