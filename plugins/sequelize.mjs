@@ -1,8 +1,57 @@
-import {DataTypes} from 'sequelize';
+import {DataTypes, Utils} from 'sequelize';
 import {SequelizeMethod} from 'sequelize/lib/utils';
 
 import {DateOnly} from '../date-only.mjs';
 import {DateTime} from '../date-time.mjs';
+
+export class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
+    static get key() {
+        return 'VINTAGE_DATETIME'
+    }
+
+    constructor(...args) {
+        super(...args);
+    }
+
+    toSql() {
+        return 'DATE';
+    }
+
+    _stringify(date) {
+        return DateOnly.fromAnyDate(date).toJSON();
+    }
+
+    stringify(date) {
+        return this._stringify(date);
+    }
+}
+
+export class DateTimeDataType extends DataTypes.ABSTRACT.prototype.constructor {
+    static get key() {
+        return 'VINTAGE_DATETIME'
+    }
+
+    constructor(...args) {
+        super(...args);
+    }
+
+    toSql() {
+        return 'DATETIME';
+    }
+
+    _stringify(date) {
+        return DateTime.fromAnyDate(date).toJSON().replace(/Z$/, '+00:00');
+    }
+
+    stringify(date) {
+        return this._stringify(date);
+    }
+}
+
+DataTypes.VINTAGE_DATEONLY = Utils.classToInvokable(DateOnlyDataType);
+DataTypes.VINTAGE_DATEONLY.prototype.key = DataTypes.VINTAGE_DATEONLY.key;
+DataTypes.VINTAGE_DATETIME = Utils.classToInvokable(DateTimeDataType);
+DataTypes.VINTAGE_DATETIME.prototype.key = DataTypes.VINTAGE_DATETIME.key;
 
 /** @returns {value is SequelizeMethod} */
 function isSequelizeMethod(value) {
@@ -51,7 +100,7 @@ function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
  */
 export function dateOnlyColumn(propertyName, strict = false) {
     return {
-        type: DataTypes.DATEONLY,
+        type: DateOnlyDataType,
         ...dateOnlyColumnGetterSetter(propertyName, strict),
     };
 }
@@ -96,7 +145,7 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
  */
 export function dateTimeColumn(propertyName, strict = false) {
     return {
-        type: DataTypes.DATE,
+        type: DateTimeDataType,
         ...dateTimeColumnGetterSetter(propertyName, strict),
     };
 }

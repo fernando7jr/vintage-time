@@ -254,6 +254,7 @@ class DateTime {
      * Construct a new date-time from a moment object value
      * @param {Moment} date any moment date
      * @param {string | undefined} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromMomentDate(date, locale) {
         return new DateTime(date, locale);
@@ -263,6 +264,7 @@ class DateTime {
      * Construct a new date-time from a plain js Date
      * @param {Date} date any plain js Date
      * @param {string | undefined} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromJsDate(date, locale) {
         return new DateTime(moment(date), locale);
@@ -272,6 +274,7 @@ class DateTime {
      * Construct a new date-time from a DateTime isntance
      * @param {DateTime} dateTime any date-time object
      * @param {string | undefined} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromDateTime(dateTime, locale) {
         if (dateTime instanceof DateTime) {
@@ -305,6 +308,7 @@ class DateTime {
      * Construct a new date-time from a DateOnly isntance
      * @param {DateOnly} dateOnly any date-only object
      * @param {string | undefined} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromDateOnly(dateOnly, locale) {
         if (__isDateOnly(dateOnly)) {
@@ -325,6 +329,7 @@ class DateTime {
      * Construct a new date-time from any valid date value
      * @param {AnyDate} dateOnly any valid date. Empty (null or undefined) or NaN will return an invalid date
      * @param {string | undefined} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromAnyDate(anyDate, locale) {
         if (!anyDate) return this.invalid();
@@ -344,6 +349,7 @@ class DateTime {
      * @param {string} dateString any valid date string
      * @param {string} format the `dateString` parsing format
      * @param {string} locale optional locale if provided
+     * @returns {DateTime}
      */
     static fromFormat(dateString, format, locale) {
         let momentDate = moment(dateString, format, true);
@@ -840,19 +846,9 @@ class DateTime {
         return `DateTime(${this.toISOString(false).replace('T', ' ')})`;
     }
 
-    // MomentJs/Sequelize Compatibility layer
-    get [Symbol.toStringTag]() {
-        return 'Date';
-    }
-
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
         return this.debug();
-    }
-
-    /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
-    getTime() {
-        return this.toTimestamp();
     }
 
     /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */

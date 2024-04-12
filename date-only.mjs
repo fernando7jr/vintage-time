@@ -797,19 +797,9 @@ export class DateOnly {
         return `DateOnly(${this.toJSON()})`;
     }
 
-    // MomentJs/Sequelize Compatibility layer
-    get [Symbol.toStringTag]() {
-        return 'Date';
-    }
-
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
         return `DateOnly(${this.toJSON()})`;
-    }
-
-    /** @deprecated This method is for compatibility only, prefer to use `toTimestamp` instead */
-    getTime() {
-        return this.toTimestamp();
     }
 
     /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */
