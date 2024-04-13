@@ -1,8 +1,12 @@
 import {DataTypes, Utils} from 'sequelize';
 import {SequelizeMethod} from 'sequelize/lib/utils';
 
-import {DateOnly} from '../date-only.mjs';
-import {DateTime} from '../date-time.mjs';
+import {DateOnly, DateTime, toDateOnly, toDateTime, isDateValid} from '../index.mjs';
+
+/** @returns {value is SequelizeMethod} */
+function isSequelizeMethod(value) {
+    return value instanceof SequelizeMethod;
+}
 
 export class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
     static get key() {
@@ -14,15 +18,11 @@ export class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
     }
 
     toSql() {
-        return 'DATE';
+        return DataTypes.DATEONLY.prototype.toSql.call(this);
     }
 
     _stringify(date) {
-        return DateOnly.fromAnyDate(date).toJSON();
-    }
-
-    stringify(date) {
-        return this._stringify(date);
+        return toDateOnly(date).toJSON();
     }
 }
 
@@ -36,26 +36,47 @@ export class DateTimeDataType extends DataTypes.ABSTRACT.prototype.constructor {
     }
 
     toSql() {
-        return 'DATETIME';
+        return DataTypes.DATE.prototype.toSql.call(this);
     }
 
     _stringify(date) {
-        return DateTime.fromAnyDate(date).toJSON().replace(/Z$/, '+00:00');
-    }
-
-    stringify(date) {
-        return this._stringify(date);
+        return toDateTime(date).toJSON().replace(/Z$/, '+00:00');
     }
 }
 
-DataTypes.VINTAGE_DATEONLY = Utils.classToInvokable(DateOnlyDataType);
-DataTypes.VINTAGE_DATEONLY.prototype.key = DataTypes.VINTAGE_DATEONLY.key;
-DataTypes.VINTAGE_DATETIME = Utils.classToInvokable(DateTimeDataType);
-DataTypes.VINTAGE_DATETIME.prototype.key = DataTypes.VINTAGE_DATETIME.key;
+if (!DataTypes.VINTAGE_DATEONLY) {
+    DataTypes.VINTAGE_DATEONLY = Utils.classToInvokable(DateOnlyDataType);
+    DataTypes.VINTAGE_DATEONLY.prototype.key = DataTypes.VINTAGE_DATEONLY.key;
+    DataTypes.VINTAGE_DATEONLY.types = DataTypes.DATEONLY.types;
+    Object.keys(DataTypes.VINTAGE_DATEONLY.types).forEach(type => {
+        const typeImplementations = DataTypes[type];
+        typeImplementations.VINTAGE_DATEONLY = Utils.classToInvokable(class extends DateOnlyDataType {
+            constructor(...args) {
+                super(...args);
+            }
 
-/** @returns {value is SequelizeMethod} */
-function isSequelizeMethod(value) {
-    return value instanceof SequelizeMethod;
+            toSql() {
+                return typeImplementations.DATEONLY.prototype.toSql.call(this);
+            }
+        });
+    });
+}
+if (!DataTypes.VINTAGE_DATETIME) {
+    DataTypes.VINTAGE_DATETIME = Utils.classToInvokable(DateTimeDataType);
+    DataTypes.VINTAGE_DATETIME.prototype.key = DataTypes.VINTAGE_DATETIME.key;
+    DataTypes.VINTAGE_DATETIME.types = DataTypes.DATE.types;
+    Object.keys(DataTypes.VINTAGE_DATETIME.types).forEach(type => {
+        const typeImplementations = DataTypes[type];
+        typeImplementations.VINTAGE_DATETIME = Utils.classToInvokable(class extends DateTimeDataType {
+            constructor(...args) {
+                super(...args);
+            }
+
+            toSql() {
+                return typeImplementations.DATE.prototype.toSql.call(this);
+            }
+        });
+    });
 }
 
 function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
@@ -80,8 +101,8 @@ function dateOnlyColumnGetterSetter(propertyName, throwOnIncompatibleType) {
                 throw new Error(`Expected a DateOnly value for "${propertyName}"`);
             }
 
-            const dateOnlyValue = DateOnly.fromAnyDate(value);
-            if (!dateOnlyValue.isValid) {
+            const dateOnlyValue = toDateOnly(value);
+            if (!isDateValid(dateOnlyValue)) {
                 throw new Error(`Can not set "Invalid date" to "${propertyName}"`);
             } else {
                 this.setDataValue(propertyName, dateOnlyValue.toJSON());
@@ -109,7 +130,7 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
     return {
         get() {
             const value = this.getDataValue(propertyName);
-            
+
             if (isSequelizeMethod(value)) return value;
             else if (!value) return null;
 
@@ -127,8 +148,8 @@ function dateTimeColumnGetterSetter(propertyName, throwOnIncompatibleType) {
                 throw new Error(`Expected a DateTime value for "${propertyName}"`);
             }
 
-            const dateTimeValue = DateTime.fromAnyDate(value);
-            if (!dateTimeValue.isValid) {
+            const dateTimeValue = toDateTime(value);
+            if (!isDateValid(dateTimeValue)) {
                 throw new Error(`Can not set "Invalid date" to "${propertyName}"`);
             } else {
                 this.setDataValue(propertyName, dateTimeValue.toJSON());

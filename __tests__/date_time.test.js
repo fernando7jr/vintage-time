@@ -1198,8 +1198,10 @@ describe('DateTime', () => {
                 const result = [
                     DateTime.fromDateOnly(DateOnly.invalid()),
                     DateTime.fromDateOnly(DateOnly.invalid(), CUSTOM_LOCALE),
+                    DateTime.fromDateOnly(null),
+                    DateTime.fromDateOnly(undefined),
                 ];
-                expect(result.map(isDateValid)).toEqual([false, false]);
+                expect(result.map(isDateValid)).toEqual([false, false, false, false]);
             });
 
             it('should handle malformed DateOnly object', () => {

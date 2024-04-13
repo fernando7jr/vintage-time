@@ -13,7 +13,7 @@ expect.extend({
         }
         const receivedDateOnlyValue = toDateOnly(received);
 
-        if (expectedDateOnlyValue.equals(receivedDateOnlyValue)) {
+        if (DateOnly.isEqual(expectedDateOnlyValue, receivedDateOnlyValue)) {
             return {pass: true};
         }
         return {
@@ -24,7 +24,7 @@ expect.extend({
     },
     dateTime(received, expected, enforceInstanceOf = false) {
         const expectedDateTimeValue = toDateTime(expected);
-        if (enforceInstanceOf && !DateTime.isDateOnly(received)) {
+        if (enforceInstanceOf && !DateTime.isDateTime(received)) {
             return {
                 pass: false,
                 message: () => `Expected "${received}" to be DateTime "${expectedDateTimeValue.toJSON()}"`,
@@ -32,7 +32,7 @@ expect.extend({
         }
         const receivedDateTimeValue = toDateTime(received);
 
-        if (expectedDateTimeValue.equals(receivedDateTimeValue)) {
+        if (DateTime.isEqual(expectedDateTimeValue, receivedDateTimeValue)) {
             return {pass: true};
         }
         return {

@@ -107,7 +107,7 @@ toDateTime.tz = (anyDate, tz, locale) => toDateTime(anyDate, locale).toTimezone(
  * @param {boolean | undefined} options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
  * @returns {string | undefined}
  */
-function __formatToDateOnly(anyDate, options = {}) {
+function __formatToDateOnly(anyDate, options) {
     if (!anyDate) return undefined;
     const {toISOForm = false, format, includeTimeAndZone = false} = options;
     if (toISOForm) {

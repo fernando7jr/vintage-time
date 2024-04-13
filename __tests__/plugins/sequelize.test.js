@@ -5,7 +5,7 @@ const {SequelizeMethod} = require('sequelize/lib/utils');
 const {DateOnly} = require('../../date-only.cjs');
 const {DateTime} = require('../../date-time.cjs');
 const {toDateOnly, toDateTime} = require('../../index.cjs');
-const {dateOnlyColumn, dateTimeColumn} = require('../../plugins/sequelize.cjs');
+const {dateOnlyColumn, dateTimeColumn, DateOnlyDataType, DateTimeDataType} = require('../../plugins/sequelize.cjs');
 
 describe('Date sequelize utils', () => {
     /** @typedef {{id: number; label: string; expiredAt?: DateOnly; storedAt: DateTime}} DateDummy */
@@ -121,8 +121,77 @@ describe('Date sequelize utils', () => {
         if (!Array.isArray(d)) {
             return {label: d.label, expiredAt: d.expiredAt, storedAt: d.storedAt};
         }
-        return d.map(({label, expiredAt, storedAt}) => ({label, expiredAt, storedAt}));
+        return d.map(getPlainObject);
     };
+
+    describe('custom types', () => {
+        describe(DateOnlyDataType.name, () => {
+            it('should contain a toSQL method', () => {
+                const instance = new DateOnlyDataType();
+                expect(instance.toSql).toBeDefined();
+                expect(instance.toSql()).toBe('DATE');
+            });
+            
+            it.each(Object.keys(DataTypes.VINTAGE_DATEONLY.types))('should handle %s databases', (type) => {
+                const typeImplementations = DataTypes[type];
+                expect(typeImplementations).toBeDefined();
+                
+                const instance = typeImplementations.VINTAGE_DATEONLY();
+                expect(instance.toSql).toBeDefined();
+                const expectedSqlValue = typeImplementations.DATEONLY.prototype.toSql.call(instance);
+                expect(instance.toSql()).toEqual(expectedSqlValue);
+            });
+
+            it('should contain a _stringify method', () => {
+                const instance = new DateOnlyDataType();
+                expect(instance._stringify).toBeDefined();
+                expect(instance._stringify('2000-10-23')).toBe('2000-10-23');
+            });
+        });
+
+        describe(DateTimeDataType.name, () => {
+            it('should contain a toSQL method', () => {
+                const instance = new DateTimeDataType();
+                expect(instance.toSql).toBeDefined();
+                expect(instance.toSql()).toBe('DATETIME');
+            });
+
+            it.each(Object.keys(DataTypes.VINTAGE_DATETIME.types))('should handle %s databases', (type) => {
+                const typeImplementations = DataTypes[type];
+                expect(typeImplementations).toBeDefined();
+                
+                const instance = typeImplementations.VINTAGE_DATETIME();
+                expect(instance.toSql).toBeDefined();
+                const expectedSqlValue = typeImplementations.DATE.prototype.toSql.call(instance);
+                expect(instance.toSql()).toEqual(expectedSqlValue);
+            });
+
+            it('should contain a _stringify method', () => {
+                const instance = new DateTimeDataType();
+                expect(instance._stringify).toBeDefined();
+                expect(instance._stringify('2000-10-23')).toBe('2000-10-23T00:00:00.000+00:00');
+            });
+        });
+
+        it('should be fine to require twice', () => {
+            const originalDateOnly = DataTypes.VINTAGE_DATEONLY;
+            const originalDateTime = DataTypes.VINTAGE_DATETIME;
+            const MOCK_DATATYPES = DataTypes;
+
+            jest.isolateModules(() => {
+                jest.mock('sequelize', () => {
+                    return {DataTypes: MOCK_DATATYPES, Utils: {}};
+                });
+                require('../../plugins/sequelize.cjs');
+
+                const afterRequireDateOnly = DataTypes.VINTAGE_DATEONLY;
+                const afterRequireDateTime = DataTypes.VINTAGE_DATETIME;
+                
+                expect(originalDateOnly).toEqual(afterRequireDateOnly);
+                expect(originalDateTime).toEqual(afterRequireDateTime);
+            });
+        });
+    });
 
     it('should create new dummy instances using DateTime and DateOnly values', async () => {
         const dateOnly = toDateOnly('2023-07-19');
