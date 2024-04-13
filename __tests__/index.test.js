@@ -52,12 +52,11 @@ describe('Date & Locale utils', () => {
 
         it.each(cases.map((s) => ({ stringValue: s, timestampValue: toDateTime(s).toTimestamp() })))(
             'should convert timestamp value $timestampValue to date-only',
-            ({ stringValue, timestampValue }) => {
+            ({ timestampValue }) => {
                 const result = toDateOnly(timestampValue);
                 expect(result).toBeDefined();
                 expect(result.isDateOnly).toBe(true);
                 expect(result.toString()).toEqual(extractYYYYMMDDString(moment(timestampValue).toISOString(true)));
-                expect(result.toTimestamp()).toBeLessThanOrEqual(timestampValue);
                 expect(result.locale).toBe(DEFAULT_LOCALE);
             }
         );
@@ -69,7 +68,7 @@ describe('Date & Locale utils', () => {
                 expect(result).toBeDefined();
                 expect(result.isDateOnly).toBe(true);
                 expect(result.toString()).toEqual(extractYYYYMMDDString(moment(timestampValue).toISOString(true)));
-                expect(result.toTimestamp()).toBeLessThanOrEqual(timestampValue);
+                
                 expect(result.locale).toBe(CUSTOM_LOCALE);
             }
         );

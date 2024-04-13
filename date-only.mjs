@@ -280,7 +280,8 @@ export class DateOnly {
      * @param {string} locale optional locale if provided
      */
     static fromJsDate(date, locale) {
-        return new DateOnly(moment(date), locale);
+        const momentDate = moment.utc({year: date.getFullYear(), month: date.getMonth(), date: date.getDate()});
+        return new DateOnly(momentDate, locale);
     }
 
     /**

@@ -316,13 +316,15 @@ class DateTime {
                 moment.tz({year: dateOnly.year, month: dateOnly.month - 1, date: dateOnly.day}, 'UTC'),
                 locale || dateOnly.locale
             );
+        } else if (dateOnly === null || dateOnly === undefined) {
+            return DateTime.invalid();
         } else if (typeof dateOnly === 'object' || __isDateTimeObject(dateOnly)) {
             return this.fromDateTime(
                 {year: dateOnly.year, month: dateOnly.month, day: dateOnly.day || dateOnly.date, timezone: 'UTC'},
                 locale
             );
         }
-        return new DateTime(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale || dateOnly.locale);
+        return new DateTime(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale || dateOnly?.locale);
     }
 
     /**

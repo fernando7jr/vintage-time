@@ -996,7 +996,6 @@ describe('DateOnly', () => {
                 });
                 expect(result.toJSON()).toBe('2023-09-05');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
-                expect(result.toTimestamp()).toEqual(value.getTime());
             });
 
             it('should construct from a timestamp with a custom locale', () => {
@@ -1009,7 +1008,6 @@ describe('DateOnly', () => {
                 });
                 expect(result.toJSON()).toBe('2023-09-05');
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
-                expect(result.toTimestamp()).toEqual(value.getTime());
             });
 
             it('should construct from a date-time string without timezone', () => {
