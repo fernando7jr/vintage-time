@@ -7,7 +7,7 @@ import {__isDateOnlyObject} from './utils/date-only.mjs';
 
 /**
  * @typedef {moment.Moment} Moment
- * @typedef {import('./date-time.mjs').DateTime} DateTime
+ * @typedef {import('./date-time.cjs').DateTime} DateTime
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  */
 /**
@@ -20,25 +20,8 @@ import {__isDateOnlyObject} from './utils/date-only.mjs';
  * @typedef {Record<AddUnit, number>} Duration
  */
 
-const ALLOWED_UNITS = new Set([
-    'year',
-    'years',
-    'y',
-    'month',
-    'months',
-    'M',
-    'week',
-    'weeks',
-    'w',
-    'quarter',
-    'quarters',
-    'Q',
-    'isoWeek',
-    'isoWeeks',
-    'W',
-]);
+const ALLOWED_UNITS = new Set(['year', 'years', 'y', 'month', 'months', 'M', 'week', 'weeks', 'w', 'quarter', 'quarters', 'Q', 'isoWeek', 'isoWeeks', 'W']);
 const DAYS_UNITS = new Set(['day', 'days', 'd', 'D']);
-const ISOWEEK_UNITS = new Set(['isoWeek', 'isoWeeks', 'W']);
 
 /**
  * @param {*} value
@@ -66,15 +49,6 @@ function __getObjectValue(value) {
 export class DateOnly {
     /** @type {Moment} */
     _innerDate;
-
-    /**
-     * Check if the value is DateOnly instance
-     * @param {*} value
-     * @returns {value is DateOnly}
-     */
-    static isDateOnly(value) {
-        return Boolean(value instanceof DateOnly || value?.isDateOnly);
-    }
 
     /**
      * Check if the value is DateOnly instance
@@ -219,7 +193,7 @@ export class DateOnly {
         }
         return minAnyDate;
     }
-    
+
     /**
      * Return the max from a set of dates. Invalid values are not considered.
      * If the set is empty or there is no valid value then it returns `undefined`.
@@ -271,7 +245,16 @@ export class DateOnly {
      * @param {string} locale optional locale if provided
      */
     static fromMomentDate(date, locale) {
-        return new DateOnly(date, locale);
+        date = moment.isMoment(date) ? date : moment(date);
+        if (!date.isValid()) return new DateOnly(NaN, locale || date.locale());
+        return new DateOnly(
+            {
+                year: date.year(),
+                month: date.month(),
+                date: date.date(),
+            },
+            locale || date.locale()
+        );
     }
 
     /**
@@ -280,8 +263,12 @@ export class DateOnly {
      * @param {string} locale optional locale if provided
      */
     static fromJsDate(date, locale) {
-        const momentDate = moment.utc({year: date.getFullYear(), month: date.getMonth(), date: date.getDate()});
-        return new DateOnly(momentDate, locale);
+        const momentDate = moment.utc({
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            date: date.getDate(),
+        });
+        return this.fromMomentDate(momentDate, locale);
     }
 
     /**
@@ -291,10 +278,10 @@ export class DateOnly {
      */
     static fromDateTime(dateTime, locale) {
         if (typeof dateTime === 'string') {
-            return new DateOnly(moment.tz(dateTime, 'UTC').startOf('day'), locale);
+            return this.fromMomentDate(moment.tz(dateTime, 'UTC').startOf('day'), locale);
         } else if (__isDateTime(dateTime)) {
             const month = __getObjectValue(dateTime.month);
-            return new DateOnly(
+            return this.fromMomentDate(
                 moment.tz(
                     {
                         year: __getObjectValue(dateTime.year),
@@ -316,12 +303,12 @@ export class DateOnly {
      */
     static fromDateOnly(dateOnly, locale) {
         if (dateOnly instanceof DateOnly) {
-            return new DateOnly(dateOnly._innerDate, locale);
+            return this.fromMomentDate(dateOnly._innerDate, locale);
         } else if (typeof dateOnly === 'string') {
-            return new DateOnly(moment.tz(dateOnly, 'UTC'), locale);
+            return this.fromMomentDate(moment.tz(dateOnly, 'UTC'), locale);
         } else if (__isDateOnlyObject(dateOnly)) {
             const month = __getObjectValue(dateOnly.month);
-            return new DateOnly(
+            return this.fromMomentDate(
                 moment.tz(
                     {
                         year: __getObjectValue(dateOnly.year),
@@ -335,7 +322,7 @@ export class DateOnly {
         }
         const dateValue = new Date(dateOnly);
         if (isNaN(dateValue)) return this.invalid();
-        return new DateOnly(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale);
+        return this.fromMomentDate(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale);
     }
 
     /**
@@ -351,11 +338,10 @@ export class DateOnly {
         else if (moment.isMoment(anyDate)) return this.fromMomentDate(anyDate, locale);
         else if (anyDate instanceof Date) return this.fromJsDate(anyDate, locale);
         else if (typeof anyDate === 'number') return this.fromJsDate(new Date(anyDate), locale);
-        else if (typeof anyDate === 'string') {
-            const slicedDate = anyDate.length === 10 ? anyDate : anyDate.slice(0, 10);
-            if (DATE_ONLY_REGEX.test(slicedDate)) return this.fromDateOnly(slicedDate, locale);
-        }
-        return this.fromJsDate(new Date(new String(anyDate)), locale);
+        anyDate = String(anyDate);
+        const slicedDate = anyDate.length === 10 ? anyDate : anyDate.slice(0, 10);
+        if (DATE_ONLY_REGEX.test(slicedDate)) return this.fromDateOnly(slicedDate, locale);
+        return this.fromJsDate(new Date(String(anyDate)), locale);
     }
 
     /**
@@ -377,7 +363,8 @@ export class DateOnly {
      * @private prefer to use any of the static methods instead
      */
     constructor(date, locale) {
-        this._innerDate = locale ? moment(date).locale(locale) : moment(date);
+        this._innerDate = moment.utc(date, true).startOf('day');
+        if (locale) this._innerDate = this._innerDate.locale(locale);
     }
 
     get isDateOnly() {
@@ -510,7 +497,7 @@ export class DateOnly {
         this._innerDate = this._innerDate.quarter(value);
     }
 
-    /** 
+    /**
      * Always return true to a DateOnly object
      * @returns {true} whether this date is at the UTC timezone or not
      */
@@ -550,7 +537,6 @@ export class DateOnly {
      */
     #resolveUnitOfTime(unitOfTime, {allowDays = false, allowIsoWeeks = true} = {}) {
         if (allowDays && DAYS_UNITS.has(unitOfTime)) return unitOfTime;
-        else if (ISOWEEK_UNITS.has(unitOfTime)) return allowIsoWeeks ? unitOfTime : '';
         return ALLOWED_UNITS.has(unitOfTime) ? unitOfTime : '';
     }
 
@@ -670,13 +656,13 @@ export class DateOnly {
         }
 
         const DATE_KEYS = new Set(['day', 'days']);
-        const MONTH_KEYS = new Set(['month','months', 'M']);
+        const MONTH_KEYS = new Set(['month', 'months', 'M']);
         const duration = {};
         for (const sourceKey in amountOrDuration) {
             let targetKey = sourceKey;
             if (DATE_KEYS.has(sourceKey.toLowerCase())) targetKey = 'date';
             else if (!this.#resolveUnitOfTime(sourceKey, {allowDays: true})) continue;
-            
+
             let amount = amountOrDuration?.[sourceKey];
             if (MONTH_KEYS.has(targetKey)) amount -= 1;
             duration[targetKey] = amount;
@@ -705,7 +691,7 @@ export class DateOnly {
      * @returns {DateOnly}
      */
     clone() {
-        return DateOnly.fromMomentDate(moment(this._innerDate));
+        return new DateOnly(this._innerDate, this.locale);
     }
 
     /**
@@ -787,7 +773,7 @@ export class DateOnly {
     }
 
     /**
-     * Return a debug string 
+     * Return a debug string
      * @returns {string}
      * @example
      * ````javascript
@@ -800,7 +786,7 @@ export class DateOnly {
 
     // For better debugging
     [Symbol.for('nodejs.util.inspect.custom')]() {
-        return `DateOnly(${this.toJSON()})`;
+        return this.debug();
     }
 
     /** @deprecated Some sequelzie versions look for this method instead of relying on MomentJs */

@@ -131,11 +131,11 @@ describe('Date sequelize utils', () => {
                 expect(instance.toSql).toBeDefined();
                 expect(instance.toSql()).toBe('DATE');
             });
-            
+
             it.each(Object.keys(DataTypes.VINTAGE_DATEONLY.types))('should handle %s databases', (type) => {
                 const typeImplementations = DataTypes[type];
                 expect(typeImplementations).toBeDefined();
-                
+
                 const instance = typeImplementations.VINTAGE_DATEONLY();
                 expect(instance.toSql).toBeDefined();
                 const expectedSqlValue = typeImplementations.DATEONLY.prototype.toSql.call(instance);
@@ -159,7 +159,7 @@ describe('Date sequelize utils', () => {
             it.each(Object.keys(DataTypes.VINTAGE_DATETIME.types))('should handle %s databases', (type) => {
                 const typeImplementations = DataTypes[type];
                 expect(typeImplementations).toBeDefined();
-                
+
                 const instance = typeImplementations.VINTAGE_DATETIME();
                 expect(instance.toSql).toBeDefined();
                 const expectedSqlValue = typeImplementations.DATE.prototype.toSql.call(instance);
@@ -186,7 +186,7 @@ describe('Date sequelize utils', () => {
 
                 const afterRequireDateOnly = DataTypes.VINTAGE_DATEONLY;
                 const afterRequireDateTime = DataTypes.VINTAGE_DATETIME;
-                
+
                 expect(originalDateOnly).toEqual(afterRequireDateOnly);
                 expect(originalDateTime).toEqual(afterRequireDateTime);
             });
@@ -348,10 +348,10 @@ describe('Date sequelize utils', () => {
         });
 
         expect(instance.expiredAt).toBeInstanceOf(SequelizeMethod);
-        instance.expiredAt = sequelize.literal('\'2020-01-01\'');
+        instance.expiredAt = sequelize.literal("'2020-01-01'");
         expect(instance.expiredAt).toBeInstanceOf(SequelizeMethod);
         expect(instance.storedAt).toBeInstanceOf(SequelizeMethod);
-        instance.storedAt = sequelize.literal('\'2020-01-01\'');
+        instance.storedAt = sequelize.literal("'2020-01-01'");
         expect(instance.storedAt).toBeInstanceOf(SequelizeMethod);
     });
 

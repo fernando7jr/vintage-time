@@ -36,15 +36,18 @@ export class DateTimeDataType extends DataTypes.ABSTRACT {
  *     },
  *     {tableName: 'dummies'}
  * );
- * 
+ *
  * // ...
- * 
+ *
  * const entry = model.findOne();
  * console.log(entry.startDate instanceof DateOnly); // true
  * ````
  */
-export function dateOnlyColumn(propertyName: string, strict?: boolean): {
-    type: DateOnlyDataType,
+export function dateOnlyColumn(
+    propertyName: string,
+    strict?: boolean
+): {
+    type: DateOnlyDataType;
     get(): DateOnly | null;
     set(value: any): void;
 };
@@ -66,15 +69,18 @@ export function dateOnlyColumn(propertyName: string, strict?: boolean): {
  *     },
  *     {tableName: 'dummies'}
  * );
- * 
+ *
  * // ...
- * 
+ *
  * const entry = model.findOne();
  * console.log(entry.archivedAt instanceof DateTime); // true
  * ````
  */
-export function dateTimeColumn(propertyName: string, strict?: boolean): {
-    type: DateTimeDataType,
+export function dateTimeColumn(
+    propertyName: string,
+    strict?: boolean
+): {
+    type: DateTimeDataType;
     get(): DateTime | null;
     set(value: any): void;
 };

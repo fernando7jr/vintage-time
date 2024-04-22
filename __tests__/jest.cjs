@@ -18,8 +18,7 @@ expect.extend({
         }
         return {
             pass: false,
-            message: () =>
-                `Expected "${receivedDateOnlyValue.toJSON()}" to be DateOnly "${expectedDateOnlyValue.toJSON()}"`,
+            message: () => `Expected "${receivedDateOnlyValue.toJSON()}" to be DateOnly "${expectedDateOnlyValue.toJSON()}"`,
         };
     },
     dateTime(received, expected, enforceInstanceOf = false) {
@@ -37,8 +36,7 @@ expect.extend({
         }
         return {
             pass: false,
-            message: () =>
-                `Expected "${receivedDateTimeValue.toJSON()}" to be DateTime "${expectedDateTimeValue.toJSON()}"`,
+            message: () => `Expected "${receivedDateTimeValue.toJSON()}" to be DateTime "${expectedDateTimeValue.toJSON()}"`,
         };
     },
 });
