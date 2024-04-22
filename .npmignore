@@ -1,4 +1,5 @@
 .github
+prettier.yaml
 .prettierignore
 *.test.js
 *.test.mjs

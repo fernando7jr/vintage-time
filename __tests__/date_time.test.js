@@ -58,32 +58,11 @@ describe('DateTime', () => {
         });
 
         describe('isEqual', () => {
-            const datesA = [
-                DateOnly.fromAnyDate('2023-01-01'),
-                DateTime.fromAnyDate('2023-01-01'),
-                '2023-01-01',
-            ];
-            const dateTimesA = [
-                DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'),
-                '2023-01-01T23:59:59.123Z',
-            ];
-            const datesB = [
-                DateOnly.fromAnyDate('2023-01-02'),
-                DateTime.fromAnyDate('2023-01-02'),
-                '2023-01-02',
-            ];
-            const dateTimesB = [
-                DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'),
-                '2023-01-02T23:59:59.123Z',
-            ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const datesA = [DateOnly.fromAnyDate('2023-01-01'), DateTime.fromAnyDate('2023-01-01'), '2023-01-01'];
+            const dateTimesA = [DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'), '2023-01-01T23:59:59.123Z'];
+            const datesB = [DateOnly.fromAnyDate('2023-01-02'), DateTime.fromAnyDate('2023-01-02'), '2023-01-02'];
+            const dateTimesB = [DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'), '2023-01-02T23:59:59.123Z'];
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateTime.isEqual(a, b);
 
@@ -143,32 +122,11 @@ describe('DateTime', () => {
         });
 
         describe('isEqualOrBefore', () => {
-            const datesA = [
-                DateOnly.fromAnyDate('2023-01-01'),
-                DateTime.fromAnyDate('2023-01-01'),
-                '2023-01-01',
-            ];
-            const dateTimesA = [
-                DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'),
-                '2023-01-01T23:59:59.123Z',
-            ];
-            const datesB = [
-                DateOnly.fromAnyDate('2023-01-02'),
-                DateTime.fromAnyDate('2023-01-02'),
-                '2023-01-02',
-            ];
-            const dateTimesB = [
-                DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'),
-                '2023-01-02T23:59:59.123Z',
-            ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const datesA = [DateOnly.fromAnyDate('2023-01-01'), DateTime.fromAnyDate('2023-01-01'), '2023-01-01'];
+            const dateTimesA = [DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'), '2023-01-01T23:59:59.123Z'];
+            const datesB = [DateOnly.fromAnyDate('2023-01-02'), DateTime.fromAnyDate('2023-01-02'), '2023-01-02'];
+            const dateTimesB = [DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'), '2023-01-02T23:59:59.123Z'];
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateTime.isEqualOrBefore(a, b);
 
@@ -227,32 +185,11 @@ describe('DateTime', () => {
         });
 
         describe('isEqualOrAfter', () => {
-            const datesB = [
-                DateOnly.fromAnyDate('2023-01-01'),
-                DateTime.fromAnyDate('2023-01-01'),
-                '2023-01-01',
-            ];
-            const dateTimesB = [
-                DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'),
-                '2023-01-01T23:59:59.123Z',
-            ];
-            const datesA = [
-                DateOnly.fromAnyDate('2023-01-02'),
-                DateTime.fromAnyDate('2023-01-02'),
-                '2023-01-02',
-            ];
-            const dateTimesA = [
-                DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'),
-                '2023-01-02T23:59:59.123Z',
-            ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const datesB = [DateOnly.fromAnyDate('2023-01-01'), DateTime.fromAnyDate('2023-01-01'), '2023-01-01'];
+            const dateTimesB = [DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'), '2023-01-01T23:59:59.123Z'];
+            const datesA = [DateOnly.fromAnyDate('2023-01-02'), DateTime.fromAnyDate('2023-01-02'), '2023-01-02'];
+            const dateTimesA = [DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'), '2023-01-02T23:59:59.123Z'];
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateTime.isEqualOrAfter(a, b);
 
@@ -311,32 +248,11 @@ describe('DateTime', () => {
         });
 
         describe('isBefore', () => {
-            const datesA = [
-                DateOnly.fromAnyDate('2023-01-01'),
-                DateTime.fromAnyDate('2023-01-01'),
-                '2023-01-01',
-            ];
-            const dateTimesA = [
-                DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'),
-                '2023-01-01T23:59:59.123Z',
-            ];
-            const datesB = [
-                DateOnly.fromAnyDate('2023-01-02'),
-                DateTime.fromAnyDate('2023-01-02'),
-                '2023-01-02',
-            ];
-            const dateTimesB = [
-                DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'),
-                '2023-01-02T23:59:59.123Z',
-            ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const datesA = [DateOnly.fromAnyDate('2023-01-01'), DateTime.fromAnyDate('2023-01-01'), '2023-01-01'];
+            const dateTimesA = [DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'), '2023-01-01T23:59:59.123Z'];
+            const datesB = [DateOnly.fromAnyDate('2023-01-02'), DateTime.fromAnyDate('2023-01-02'), '2023-01-02'];
+            const dateTimesB = [DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'), '2023-01-02T23:59:59.123Z'];
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateTime.isBefore(a, b);
 
@@ -393,32 +309,11 @@ describe('DateTime', () => {
         });
 
         describe('isAfter', () => {
-            const datesB = [
-                DateOnly.fromAnyDate('2023-01-01'),
-                DateTime.fromAnyDate('2023-01-01'),
-                '2023-01-01',
-            ];
-            const dateTimesB = [
-                DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'),
-                '2023-01-01T23:59:59.123Z',
-            ];
-            const datesA = [
-                DateOnly.fromAnyDate('2023-01-02'),
-                DateTime.fromAnyDate('2023-01-02'),
-                '2023-01-02',
-            ];
-            const dateTimesA = [
-                DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'),
-                '2023-01-02T23:59:59.123Z',
-            ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const datesB = [DateOnly.fromAnyDate('2023-01-01'), DateTime.fromAnyDate('2023-01-01'), '2023-01-01'];
+            const dateTimesB = [DateTime.fromAnyDate('2023-01-01T23:59:59.123Z'), '2023-01-01T23:59:59.123Z'];
+            const datesA = [DateOnly.fromAnyDate('2023-01-02'), DateTime.fromAnyDate('2023-01-02'), '2023-01-02'];
+            const dateTimesA = [DateTime.fromAnyDate('2023-01-02T23:59:59.123Z'), '2023-01-02T23:59:59.123Z'];
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateTime.isAfter(a, b);
 
@@ -475,14 +370,7 @@ describe('DateTime', () => {
         });
 
         describe('isEqualOrBeforeNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateTime.now();
             const compareFn = (a) => DateTime.isEqualOrBeforeNow(a);
@@ -507,14 +395,7 @@ describe('DateTime', () => {
         });
 
         describe('isEqualOrAfterNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateTime.now();
             const compareFn = (a) => DateTime.isEqualOrAfterNow(a);
@@ -539,14 +420,7 @@ describe('DateTime', () => {
         });
 
         describe('isBeforeNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateTime.now();
             const compareFn = (a) => DateTime.isBeforeNow(a);
@@ -571,14 +445,7 @@ describe('DateTime', () => {
         });
 
         describe('isAfterNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateTime.now();
             const compareFn = (a) => DateTime.isAfterNow(a);
@@ -732,8 +599,9 @@ describe('DateTime', () => {
                 const result = [
                     DateTime.fromMomentDate(moment.invalid()),
                     DateTime.fromMomentDate(moment.invalid(), CUSTOM_LOCALE),
+                    DateTime.fromMomentDate(NaN, CUSTOM_LOCALE),
                 ];
-                expect(result.map(isDateValid)).toEqual([false, false]);
+                expect(result.map(isDateValid)).toEqual([false, false, false]);
             });
         });
 
@@ -899,7 +767,15 @@ describe('DateTime', () => {
 
             it('should construct from a object with date properties with a custom locale', () => {
                 const result = DateTime.fromDateTime(
-                    {year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248},
+                    {
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    },
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -1134,7 +1010,33 @@ describe('DateTime', () => {
             });
 
             it('should construct from a object with date properties', () => {
-                const result = DateTime.fromDateOnly({year: 2020, month: 10, day: 27});
+                const result = DateTime.fromDateOnly({
+                    year: 2020,
+                    month: 10,
+                    day: 27,
+                });
+                expect(result.toObject()).toEqual({
+                    year: 2020,
+                    month: 10,
+                    day: 27,
+                    hour: 0,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                    offset: UTC_TZ_OFFSET,
+                    timezone: UTC_TZ,
+                });
+                expect(result.toJSON()).toBe('2020-10-27T00:00:00.000Z');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+            });
+
+            it('should construct from a object with date properties using aliases', () => {
+                const result = DateTime.fromDateOnly({
+                    year: 2020,
+                    month: 10,
+                    date: 27,
+                    hour: 9,
+                });
                 expect(result.toObject()).toEqual({
                     year: 2020,
                     month: 10,
@@ -1554,8 +1456,14 @@ describe('DateTime', () => {
 
             it('should construct from a date-time string with timezone (+)', () => {
                 const strings = [
-                    {value: '2023-09-05 12:44:36+14:00', expected: '2023-09-04T22:44:36.000Z'},
-                    {value: '2023-09-05 12:44:36.123+14:00', expected: '2023-09-04T22:44:36.123Z'},
+                    {
+                        value: '2023-09-05 12:44:36+14:00',
+                        expected: '2023-09-04T22:44:36.000Z',
+                    },
+                    {
+                        value: '2023-09-05 12:44:36.123+14:00',
+                        expected: '2023-09-04T22:44:36.123Z',
+                    },
                 ];
                 for (const {value, expected} of strings) {
                     const hasMilliseconds = value.includes('.');
@@ -1577,8 +1485,14 @@ describe('DateTime', () => {
 
             it('should construct from a date-time string with timezone (-)', () => {
                 const strings = [
-                    {value: '2023-09-05 17:44:36-10:00', expected: '2023-09-06T03:44:36.000Z'},
-                    {value: '2023-09-05 17:44:36.123-10:00', expected: '2023-09-06T03:44:36.123Z'},
+                    {
+                        value: '2023-09-05 17:44:36-10:00',
+                        expected: '2023-09-06T03:44:36.000Z',
+                    },
+                    {
+                        value: '2023-09-05 17:44:36.123-10:00',
+                        expected: '2023-09-06T03:44:36.123Z',
+                    },
                 ];
                 for (const {value, expected} of strings) {
                     const hasMilliseconds = value.includes('.');
@@ -1614,9 +1528,7 @@ describe('DateTime', () => {
                         offset: UTC_TZ_OFFSET,
                         timezone: UTC_TZ,
                     });
-                    expect(result.toJSON()).toBe(
-                        `${value.slice(0, value.length - 1).replace(' ', 'T')}${hasMilliseconds ? '' : '.000'}Z`
-                    );
+                    expect(result.toJSON()).toBe(`${value.slice(0, value.length - 1).replace(' ', 'T')}${hasMilliseconds ? '' : '.000'}Z`);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
                 }
             });
@@ -1644,8 +1556,14 @@ describe('DateTime', () => {
 
             it('should construct from a iso date string with timezone (+)', () => {
                 const strings = [
-                    {value: '2023-09-05T17:44:36+14:00', expected: '2023-09-05T03:44:36.000Z'},
-                    {value: '2023-09-05T17:44:36.123+14:00', expected: '2023-09-05T03:44:36.123Z'},
+                    {
+                        value: '2023-09-05T17:44:36+14:00',
+                        expected: '2023-09-05T03:44:36.000Z',
+                    },
+                    {
+                        value: '2023-09-05T17:44:36.123+14:00',
+                        expected: '2023-09-05T03:44:36.123Z',
+                    },
                 ];
                 for (const {value, expected} of strings) {
                     const hasMilliseconds = value.includes('.');
@@ -1668,8 +1586,14 @@ describe('DateTime', () => {
 
             it('should construct from a iso date string with timezone (-)', () => {
                 const strings = [
-                    {value: '2023-09-05T01:44:36-10:00', expected: '2023-09-05T11:44:36.000Z'},
-                    {value: '2023-09-05T01:44:36.123-10:00', expected: '2023-09-05T11:44:36.123Z'},
+                    {
+                        value: '2023-09-05T01:44:36-10:00',
+                        expected: '2023-09-05T11:44:36.000Z',
+                    },
+                    {
+                        value: '2023-09-05T01:44:36.123-10:00',
+                        expected: '2023-09-05T11:44:36.123Z',
+                    },
                 ];
                 for (const {value, expected} of strings) {
                     const hasMilliseconds = value.includes('.');
@@ -1706,9 +1630,7 @@ describe('DateTime', () => {
                         offset: UTC_TZ_OFFSET,
                         timezone: UTC_TZ,
                     });
-                    expect(result.toJSON()).toBe(
-                        `${value.slice(0, value.length - 1)}${hasMilliseconds ? '' : '.000'}Z`
-                    );
+                    expect(result.toJSON()).toBe(`${value.slice(0, value.length - 1)}${hasMilliseconds ? '' : '.000'}Z`);
                     expect(result.locale).toEqual(DEFAULT_LOCALE);
                 }
             });
@@ -1786,7 +1708,14 @@ describe('DateTime', () => {
             });
 
             it('should construct from a object with date properties', () => {
-                const result = DateTime.fromAnyDate({year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59});
+                const result = DateTime.fromAnyDate({
+                    year: 2020,
+                    month: 10,
+                    day: 27,
+                    hour: 9,
+                    minute: 48,
+                    second: 59,
+                });
                 expect(result.toObject()).toEqual({
                     year: 2020,
                     month: 10,
@@ -1831,7 +1760,15 @@ describe('DateTime', () => {
 
             it('should construct from a object with date properties with a custom locale', () => {
                 const result = DateTime.fromAnyDate(
-                    {year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248},
+                    {
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    },
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -2037,6 +1974,23 @@ describe('DateTime', () => {
                 expect(result.locale).toEqual(CUSTOM_LOCALE);
             });
 
+            it('should parse DD/MM/YYYY HH:mm:ssZ using "Z"', () => {
+                const result = DateTime.fromFormat('02/11/1998 22:15:44Z', 'DD/MM/YYYY HH:mm:ssZ', CUSTOM_LOCALE);
+                expect(result.toObject()).toEqual({
+                    year: 1998,
+                    month: 11,
+                    day: 2,
+                    hour: 22,
+                    minute: 15,
+                    second: 44,
+                    millisecond: 0,
+                    offset: 'UTC',
+                    timezone: 'UTC',
+                });
+                expect(result.toJSON()).toBe('1998-11-02T22:15:44.000Z');
+                expect(result.locale).toEqual(CUSTOM_LOCALE);
+            });
+
             it('should fail to parse and return an invalid date', () => {
                 const result = [
                     DateTime.fromFormat('1998-02-11', 'MM/DD/YYYY'),
@@ -2060,10 +2014,7 @@ describe('DateTime', () => {
         describe('locale', () => {
             it('should get locale', () => {
                 const defaultLocaleValues = [DateTime.now(), DateTime.invalid(), DateTime.fromAnyDate('2025-12-17')];
-                const customLocaleValues = [
-                    DateTime.now(CUSTOM_LOCALE),
-                    DateTime.fromAnyDate('2025-12-17', CUSTOM_LOCALE),
-                ];
+                const customLocaleValues = [DateTime.now(CUSTOM_LOCALE), DateTime.fromAnyDate('2025-12-17', CUSTOM_LOCALE)];
                 expect(defaultLocaleValues.map((v) => v.locale)).toEqual(defaultLocaleValues.map(() => DEFAULT_LOCALE));
                 expect(customLocaleValues.map((v) => v.locale)).toEqual(customLocaleValues.map(() => CUSTOM_LOCALE));
             });
@@ -2285,24 +2236,21 @@ describe('DateTime', () => {
                 });
             });
 
-            it.each(['day', 'days', 'd', 'D'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.startOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 0,
-                        minute: 0,
-                        second: 0,
-                        millisecond: 0,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['day', 'days', 'd', 'D'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.startOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 0,
+                    minute: 0,
+                    second: 0,
+                    millisecond: 0,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
             it.each(['hour', 'hours', 'h'])('should have no effect when settting the date to start of %s', (unit) => {
                 const result = dateTime.startOf(unit);
@@ -2320,43 +2268,37 @@ describe('DateTime', () => {
                 });
             });
 
-            it.each(['minute', 'minutes', 'm'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.startOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 3,
-                        minute: 15,
-                        second: 0,
-                        millisecond: 0,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['minute', 'minutes', 'm'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.startOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 3,
+                    minute: 15,
+                    second: 0,
+                    millisecond: 0,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
-            it.each(['second', 'seconds', 's'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.startOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 3,
-                        minute: 15,
-                        second: 47,
-                        millisecond: 0,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['second', 'seconds', 's'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.startOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 3,
+                    minute: 15,
+                    second: 47,
+                    millisecond: 0,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
             it('should have no effect when settting the date to start of something unhandled', () => {
                 for (const unit of [null, '', 'world', 'millisecond', 'milliseconds', 'ms']) {
@@ -2434,24 +2376,21 @@ describe('DateTime', () => {
                 });
             });
 
-            it.each(['day', 'days', 'd', 'D'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.endOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 23,
-                        minute: 59,
-                        second: 59,
-                        millisecond: 999,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['day', 'days', 'd', 'D'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.endOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 23,
+                    minute: 59,
+                    second: 59,
+                    millisecond: 999,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
             it.each(['hour', 'hours', 'h'])('should have no effect when settting the date to start of %s', (unit) => {
                 const result = dateTime.endOf(unit);
@@ -2469,43 +2408,37 @@ describe('DateTime', () => {
                 });
             });
 
-            it.each(['minute', 'minutes', 'm'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.endOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 3,
-                        minute: 15,
-                        second: 59,
-                        millisecond: 999,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['minute', 'minutes', 'm'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.endOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 3,
+                    minute: 15,
+                    second: 59,
+                    millisecond: 999,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
-            it.each(['second', 'seconds', 's'])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateTime.endOf(unit);
-                    expect(result.toString()).not.toEqual(dateTime.toString());
-                    expect(result.toObject()).toEqual({
-                        year: 2029,
-                        month: 8,
-                        day: 23,
-                        hour: 3,
-                        minute: 15,
-                        second: 47,
-                        millisecond: 999,
-                        offset: UTC_TZ,
-                        timezone: UTC_TZ_OFFSET,
-                    });
-                }
-            );
+            it.each(['second', 'seconds', 's'])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateTime.endOf(unit);
+                expect(result.toString()).not.toEqual(dateTime.toString());
+                expect(result.toObject()).toEqual({
+                    year: 2029,
+                    month: 8,
+                    day: 23,
+                    hour: 3,
+                    minute: 15,
+                    second: 47,
+                    millisecond: 999,
+                    offset: UTC_TZ,
+                    timezone: UTC_TZ_OFFSET,
+                });
+            });
 
             it('should have no effect when settting the date to start of something unhandled', () => {
                 for (const unit of [null, '', 'world', 'millisecond', 'milliseconds', 'ms']) {
@@ -2521,7 +2454,7 @@ describe('DateTime', () => {
             const dateTime = toDateTime('2029-08-23');
 
             it('should sum a duration object', () => {
-                const result = dateTime.plus({days: 7, month: 1, hours: 2});
+                const result = dateTime.plus({days: 7, month: 1, hours: 2, seconds: 0});
                 expect(result.toObject()).toEqual({
                     year: 2029,
                     month: 9,
@@ -2562,7 +2495,7 @@ describe('DateTime', () => {
             const dateTime = toDateTime('2029-08-23');
 
             it('should sum a duration object', () => {
-                const result = dateTime.minus({days: 3, month: 1});
+                const result = dateTime.minus({days: 3, month: 1, seconds: 0});
                 expect(result.toObject()).toEqual({
                     year: 2029,
                     month: 7,
@@ -2659,7 +2592,7 @@ describe('DateTime', () => {
                 week: Math.abs(dateA.week - dateB.week),
                 quarter: Math.abs(dateA.quarter - dateB.quarter),
             };
-    
+
             it.each(Object.keys(dateProperties))('should get the difference in %ss', (prop) => {
                 const diffAmount = dateProperties[prop];
                 expect(dateA.diff(dateB, prop)).toEqual(!diffAmount ? 0 : -diffAmount);
@@ -2775,11 +2708,40 @@ describe('DateTime', () => {
         it('should contain replace, startsWith and endsWith methods which are used by sequelize', () => {
             const dateTime = DateTime.now();
             const dateString = dateTime.toJSON();
-            expect(dateTime.replace('\'', '')).toEqual(dateString);
+            expect(dateTime.replace("'", '')).toEqual(dateString);
             expect(dateTime.startsWith(dateString)).toBe(true);
             expect(dateTime.startsWith(dateString[0])).toBe(true);
             expect(dateTime.endsWith(dateString)).toBe(true);
             expect(dateTime.endsWith(dateString.at(-1))).toBe(true);
+        });
+
+        it('should be correctly asserted using expect.toEqual', () => {
+            const dateTime1 = toDateTime('2023-01-02');
+            const dateTime2 = toDateTime({year: 2023, month: 1, day: 2, tz: UTC_TZ});
+            const dateTime3 = toDateTime('2023-01-02T00:00:00Z');
+            const dateTime4 = toDateTime(moment.utc('2023-01-02T00:00:00Z'));
+            const dateTime5 = toDateTime(new Date('2023-01-02T00:00:00.000Z')).toUTC();
+            expect(dateTime1).toEqual(dateTime1.clone());
+            expect(dateTime2).toEqual(dateTime2.clone());
+            expect(dateTime3).toEqual(dateTime3.clone());
+            expect(dateTime4).toEqual(dateTime4.clone());
+            expect(dateTime5).toEqual(dateTime5.clone());
+            expect(dateTime5).toEqual(dateTime5.clone());
+            expect(dateTime1).toEqual(dateTime2);
+            expect(dateTime1).toEqual(dateTime3);
+            expect(dateTime1).toEqual(dateTime4);
+            expect(dateTime1).toEqual(dateTime5);
+            expect(dateTime1.toJSON()).toEqual(dateTime2.toJSON());
+            expect(dateTime1.toJSON()).toEqual(dateTime3.toJSON());
+            expect(dateTime1.toJSON()).toEqual(dateTime4.toJSON());
+            expect(dateTime1.toJSON()).toEqual(dateTime5.toJSON());
+            expect(dateTime1.toObject()).toEqual(dateTime2.toObject());
+            expect(dateTime1.toObject()).toEqual(dateTime3.toObject());
+            expect(dateTime1.toObject()).toEqual(dateTime4.toObject());
+            expect(dateTime1.toObject()).toEqual(dateTime5.toObject());
+            expect(dateTime2).toEqual(dateTime3);
+            expect(dateTime2).toEqual(dateTime4);
+            expect(dateTime3).toEqual(dateTime4);
         });
 
         it('should be correctly asserted using expect.toMatchObject', () => {

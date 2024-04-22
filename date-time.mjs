@@ -13,7 +13,7 @@ import {getLocalTimezone} from './utils/tz.cjs';
  * @typedef {StartOfUnit} EndOfUnit
  * @typedef {moment.unitOfTime.All} AddUnit
  * @typedef {AddUnit} SubtractUnit
- * @typedef {import('./date-time.mjs').DateOnly} DateOnly
+ * @typedef {import('./date-time.cjs').DateOnly} DateOnly
  * @typedef {DateOnly | DateTime | Date | Moment | string} AnyDate
  * @typedef {Record<AddUnit, number>} Duration
  */
@@ -43,8 +43,14 @@ function __getObjectValue(value) {
 }
 
 export class DateTime {
-    /** @type {Moment} */
-    _innerDate;
+    /** @type {number} */
+    #timestamp = 0;
+    /** @type {string|null} */
+    #timezone = null;
+    /** @type {number} */
+    #offset = 0;
+    /** @type {string|null} */
+    #locale = null;
 
     /**
      * Check if the value is DateTime instance
@@ -189,7 +195,7 @@ export class DateTime {
         }
         return minAnyDate;
     }
-    
+
     /**
      * Return the max from a set of dates. Invalid values are not considered.
      * If the set is empty or there is no valid value then it returns `undefined`.
@@ -216,7 +222,7 @@ export class DateTime {
      * @returns {DateTime} a new date-time using the current system time for its value
      */
     static now(locale) {
-        return new DateTime(moment(), locale);
+        return this.fromMomentDate(moment(), locale);
     }
 
     /**
@@ -232,7 +238,7 @@ export class DateTime {
      * ```
      */
     static invalid() {
-        return new DateTime(moment(NaN));
+        return new DateTime(NaN);
     }
 
     static _fromString(dateString, locale) {
@@ -247,7 +253,7 @@ export class DateTime {
         }
         const dateValue = new Date(dateString);
         if (isNaN(dateValue)) return this.invalid();
-        return new DateTime(moment(dateValue), locale);
+        return this.fromMomentDate(dateValue, locale);
     }
 
     /**
@@ -257,7 +263,10 @@ export class DateTime {
      * @returns {DateTime}
      */
     static fromMomentDate(date, locale) {
-        return new DateTime(date, locale);
+        date = moment.isMoment(date) ? date : moment(date);
+        if (!date.isValid()) return new DateTime(NaN, locale || date.locale());
+        const dateTime = new DateTime(date, locale || date.locale());
+        return dateTime;
     }
 
     /**
@@ -267,7 +276,7 @@ export class DateTime {
      * @returns {DateTime}
      */
     static fromJsDate(date, locale) {
-        return new DateTime(moment(date), locale);
+        return this.fromMomentDate(date, locale);
     }
 
     /**
@@ -278,7 +287,7 @@ export class DateTime {
      */
     static fromDateTime(dateTime, locale) {
         if (dateTime instanceof DateTime) {
-            return new DateTime(dateTime._innerDate, locale);
+            return new DateTime(dateTime, locale);
         } else if (typeof dateTime === 'string') {
             return DateTime._fromString(dateTime, locale);
         } else if (typeof dateTime === 'number') {
@@ -286,7 +295,7 @@ export class DateTime {
         } else if (typeof dateTime !== 'object') {
             return DateTime.invalid();
         }
-        
+
         const month = __getObjectValue(dateTime.month);
         const obj = {
             year: __getObjectValue(dateTime.year),
@@ -298,10 +307,10 @@ export class DateTime {
             millisecond: __getObjectValue(dateTime.millisecond) || __getObjectValue(dateTime.milliseconds),
         };
         const tz = __getObjectValue(dateTime.timezone) || __getObjectValue(dateTime.tz);
-        if (tz) return new DateTime(moment.tz(obj, tz), locale);
+        if (tz) return this.fromMomentDate(moment.tz(obj, tz), locale);
         const offset = __getObjectValue(dateTime.offset);
-        if (offset) return new DateTime(moment(obj).utcOffset(offset, true), locale);
-        return new DateTime(moment(obj), locale);
+        if (offset) return this.fromMomentDate(moment(obj).utcOffset(offset, true), locale);
+        return this.fromMomentDate(moment(obj), locale);
     }
 
     /**
@@ -311,20 +320,22 @@ export class DateTime {
      * @returns {DateTime}
      */
     static fromDateOnly(dateOnly, locale) {
-        if (__isDateOnly(dateOnly)) {
-            return new DateTime(
-                moment.tz({year: dateOnly.year, month: dateOnly.month - 1, date: dateOnly.day}, 'UTC'),
+        if (__isDateOnly(dateOnly) || __isDateTimeObject(dateOnly)) {
+            return this.fromMomentDate(
+                moment.tz(
+                    {
+                        year: dateOnly.year,
+                        month: dateOnly.month - 1,
+                        date: dateOnly.day || dateOnly.date,
+                    },
+                    'UTC'
+                ),
                 locale || dateOnly.locale
             );
         } else if (dateOnly === null || dateOnly === undefined) {
             return DateTime.invalid();
-        } else if (typeof dateOnly === 'object' || __isDateTimeObject(dateOnly)) {
-            return this.fromDateTime(
-                {year: dateOnly.year, month: dateOnly.month, day: dateOnly.day || dateOnly.date, timezone: 'UTC'},
-                locale
-            );
         }
-        return new DateTime(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale || dateOnly?.locale);
+        return this.fromMomentDate(moment.tz(String(dateOnly), 'UTC').startOf('day'), locale || dateOnly?.locale);
     }
 
     /**
@@ -341,7 +352,7 @@ export class DateTime {
         else if (anyDate instanceof Date) return this.fromJsDate(anyDate, locale);
         else if (typeof anyDate === 'number') return this.fromJsDate(new Date(anyDate), locale);
         else if (typeof anyDate === 'string') return this._fromString(anyDate, locale);
-        return this.fromJsDate(new Date(new String(anyDate)), locale);
+        return this.fromJsDate(new Date(String(anyDate)), locale);
     }
 
     /**
@@ -366,11 +377,40 @@ export class DateTime {
      * @param {string | undefined} locale optional locale if provided
      */
     constructor(date, locale) {
-        this._innerDate = locale ? moment(date).locale(locale) : moment(date);
+        this.#locale = locale ?? moment().locale();
+        if (date instanceof DateTime) {
+            this.#timestamp = date.#timestamp;
+            this.#timezone = date.#timezone;
+            this.#offset = date.#offset;
+        } else if (typeof date === 'number') {
+            this.#timestamp = date;
+        } else {
+            this.#copyMomentDate(moment(date));
+        }
+    }
+
+    /**
+     * Copy a moment date object properties
+     * @param {Moment} date
+     */
+    #copyMomentDate(date) {
+        this.#timestamp = date.valueOf();
+        this.#timezone = date.tz() ?? null;
+        this.#offset = date.utcOffset();
     }
 
     get isDateTime() {
         return true;
+    }
+
+    get #_innerDate() {
+        let momentDate;
+        if (this.#timezone) {
+            momentDate = moment.tz(this.#timestamp, this.#timezone);
+        } else {
+            momentDate = moment(this.#timestamp).utcOffset(this.#offset || 0);
+        }
+        return momentDate.locale(this.#locale);
     }
 
     /**
@@ -378,183 +418,180 @@ export class DateTime {
      * @returns {string} the locale set to this date. Defaults to the global locale if none was provided
      */
     get locale() {
-        return this._innerDate.locale();
+        return this.#locale;
     }
 
     get timezone() {
         if (this.isUTC) return 'UTC';
-        const tz = this._innerDate.tz();
-        if (tz) return tz;
+        if (this.#timezone) return this.#timezone;
 
-        const offset = this._innerDate.utcOffset();
-        if (offset === moment().utcOffset()) return getLocalTimezone();
+        if (this.#offset === moment().utcOffset()) return getLocalTimezone();
         return undefined;
     }
 
     get offset() {
-        const offset = this._innerDate.format('Z');
-        return offset === '+00:00' ? 'UTC' : offset;
+        return this.#offset === 0 ? 'UTC' : this.#_innerDate.format('Z');
     }
 
     /**
      * @returns {number}
      */
     get year() {
-        return this._innerDate.year();
+        return this.#_innerDate.year();
     }
 
     /**
      * @param {number} value
      */
     set year(value) {
-        this._innerDate = this._innerDate.year(value);
+        this.#copyMomentDate(this.#_innerDate.year(value));
     }
 
     /**
      * @returns {number}
      */
     get month() {
-        return this._innerDate.month() + 1;
+        return this.#_innerDate.month() + 1;
     }
 
     /**
      * @param {number} value
      */
     set month(value) {
-        this._innerDate.month(value - 1);
+        this.#copyMomentDate(this.#_innerDate.month(value - 1));
     }
 
     /**
      * @returns {number}
      */
     get day() {
-        return this._innerDate.date();
+        return this.#_innerDate.date();
     }
 
     /**
      * @param {number} value
      */
     set day(value) {
-        this._innerDate = this._innerDate.date(value);
+        this.#copyMomentDate(this.#_innerDate.date(value));
     }
 
     /**
      * @returns {number}
      */
     get week() {
-        return this._innerDate.week();
+        return this.#_innerDate.week();
     }
 
     /**
      * @param {number} value
      */
     set week(value) {
-        this._innerDate = this._innerDate.week(value);
+        this.#copyMomentDate(this.#_innerDate.week(value));
     }
 
     /**
      * @returns {number}
      */
     get weekday() {
-        return this._innerDate.weekday();
+        return this.#_innerDate.weekday();
     }
 
     /**
      * @param {number} value
      */
     set weekday(value) {
-        this._innerDate = this._innerDate.weekday(value);
+        this.#copyMomentDate(this.#_innerDate.weekday(value));
     }
 
     /**
      * @returns {number}
      */
     get dayOfYear() {
-        return this._innerDate.dayOfYear();
+        return this.#_innerDate.dayOfYear();
     }
 
     /**
      * @param {number} value
      */
     set dayOfYear(value) {
-        this._innerDate = this._innerDate.dayOfYear(value);
+        this.#copyMomentDate(this.#_innerDate.dayOfYear(value));
     }
 
     /**
      * @returns {number}
      */
     get quarter() {
-        return this._innerDate.quarter();
+        return this.#_innerDate.quarter();
     }
 
     /**
      * @param {number} value
      */
     set quarter(value) {
-        this._innerDate = this._innerDate.quarter(value);
+        this.#copyMomentDate(this.#_innerDate.quarter(value));
     }
 
     /**
      * @returns {number}
      */
     get hour() {
-        return this._innerDate.hours();
+        return this.#_innerDate.hours();
     }
 
     /**
      * @param {number} value
      */
     set hour(value) {
-        this._innerDate = this._innerDate.hours(value);
+        this.#copyMomentDate(this.#_innerDate.hours(value));
     }
 
     /**
      * @returns {number}
      */
     get minute() {
-        return this._innerDate.minutes();
+        return this.#_innerDate.minutes();
     }
 
     /**
      * @param {number} value
      */
     set minute(value) {
-        this._innerDate = this._innerDate.minutes(value);
+        this.#copyMomentDate(this.#_innerDate.minutes(value));
     }
 
     /**
      * @returns {number}
      */
     get second() {
-        return this._innerDate.seconds();
+        return this.#_innerDate.seconds();
     }
 
     /**
      * @param {number} value
      */
     set second(value) {
-        this._innerDate = this._innerDate.seconds(value);
+        this.#copyMomentDate(this.#_innerDate.seconds(value));
     }
 
     /**
      * @returns {number}
      */
     get millisecond() {
-        return this._innerDate.milliseconds();
+        return this.#_innerDate.milliseconds();
     }
 
     /**
      * @param {number} value
      */
     set millisecond(value) {
-        this._innerDate = this._innerDate.milliseconds(value);
+        this.#copyMomentDate(this.#_innerDate.milliseconds(value));
     }
 
-    /** 
+    /**
      * @returns {true} whether this date is at the UTC timezone or not
      */
     get isUTC() {
-        return this._innerDate.isUTC() || this.offset === 'UTC';
+        return this.#timezone === 'UTC' || this.#_innerDate.isUTC() || this.offset === 'UTC';
     }
 
     /**
@@ -562,14 +599,14 @@ export class DateTime {
      * @returns {boolean} true if this is a valid date, false otherwise
      */
     get isValid() {
-        return this._innerDate.isValid();
+        return !isNaN(this.#timestamp);
     }
 
     /**
      * @returns {boolean} true if this date year is a leap year, false otherwise
      */
     get isLeapYear() {
-        return this._innerDate.isLeapYear();
+        return this.#_innerDate.isLeapYear();
     }
 
     /**
@@ -578,7 +615,7 @@ export class DateTime {
      * @returns {DateTime} a new DateTime using the specified timezone
      */
     toTimezone(timezone) {
-        return DateTime.fromMomentDate(moment.tz(this._innerDate, timezone));
+        return DateTime.fromMomentDate(moment.tz(this.#_innerDate, timezone));
     }
 
     /**
@@ -595,7 +632,7 @@ export class DateTime {
      * @returns {string} date string using the provided formatting
      */
     format(format = LOCALE_FORMATS.VERBAL_DATE_TIME_LONG) {
-        return this._innerDate.format(format);
+        return this.#_innerDate.format(format);
     }
 
     /**
@@ -604,7 +641,7 @@ export class DateTime {
      * @returns {DateTime} new DateTime object at the start of `unitOfTime`
      */
     startOf(unitOfTime) {
-        return DateTime.fromMomentDate(moment(this._innerDate).startOf(unitOfTime));
+        return DateTime.fromMomentDate(this.#_innerDate.startOf(unitOfTime));
     }
 
     /**
@@ -613,7 +650,7 @@ export class DateTime {
      * @returns {DateTime} new DateTime object at the end of `unitOfTime`
      */
     endOf(unitOfTime) {
-        return DateTime.fromMomentDate(moment(this._innerDate).endOf(unitOfTime));
+        return DateTime.fromMomentDate(this.#_innerDate.endOf(unitOfTime));
     }
 
     /**
@@ -647,7 +684,7 @@ export class DateTime {
             duration[key] = amount;
         }
 
-        return DateTime.fromMomentDate(moment(this._innerDate).add(duration));
+        return DateTime.fromMomentDate(this.#_innerDate.add(duration));
     }
 
     /**
@@ -681,7 +718,7 @@ export class DateTime {
             duration[key] = amount;
         }
 
-        return DateTime.fromMomentDate(moment(this._innerDate).subtract(duration));
+        return DateTime.fromMomentDate(this.#_innerDate.subtract(duration));
     }
 
     /**
@@ -710,18 +747,18 @@ export class DateTime {
         }
 
         const DATE_KEYS = new Set(['day', 'days']);
-        const MONTH_KEYS = new Set(['month','months', 'M']);
+        const MONTH_KEYS = new Set(['month', 'months', 'M']);
         const duration = {};
         for (const sourceKey in amountOrDuration) {
             let targetKey = sourceKey;
             if (DATE_KEYS.has(sourceKey.toLowerCase())) targetKey = 'date';
-            
+
             let amount = amountOrDuration?.[sourceKey];
             if (MONTH_KEYS.has(targetKey)) amount -= 1;
             duration[targetKey] = amount;
         }
 
-        this._innerDate.set(duration);
+        this.#copyMomentDate(this.#_innerDate.set(duration));
         return this;
     }
 
@@ -736,7 +773,7 @@ export class DateTime {
     diff(date, unitOfTime, precise) {
         const dateTime = DateTime.fromAnyDate(date);
         if (!this.isValid || !dateTime.isValid) throw new Error(`Can not subtract "${this.toJSON()}" from "${dateTime.toJSON()}"`);
-        return this._innerDate.diff(dateTime._innerDate, unitOfTime, precise);
+        return this.#_innerDate.diff(dateTime.#_innerDate, unitOfTime, precise);
     }
 
     /**
@@ -744,7 +781,7 @@ export class DateTime {
      * @returns {DateTime}
      */
     clone() {
-        return DateTime.fromMomentDate(moment(this._innerDate));
+        return new DateTime(this, this.#locale);
     }
 
     /**
@@ -753,7 +790,7 @@ export class DateTime {
      * @returns {number} the timestamp for this DateTime
      */
     valueOf() {
-        return this._innerDate.valueOf();
+        return this.#_innerDate.valueOf();
     }
 
     /**
@@ -763,19 +800,19 @@ export class DateTime {
      */
     equals(anyDate) {
         if (!this.isValid) return false;
-        const dateOnly = DateTime.fromAnyDate(anyDate);
-        if (!dateOnly.isValid) return false;
-        return this.valueOf() === dateOnly.valueOf();
+        const dateTime = DateTime.fromAnyDate(anyDate);
+        if (!dateTime.isValid) return false;
+        return this.valueOf() === dateTime.valueOf();
     }
 
-   /**
+    /**
      * Return a plain JS Date object based on this DateTime value.
      * The Date object is going to be at the local timezone, so the date might be off by one day.
      * Same as calling `new Date(this.toTimestamp())` or `new Date(this.toISOString())`.
      * @returns {Date} an equivalent JS Date object for this DateTime value
      */
     toJsDate() {
-        return this._innerDate.toDate();
+        return this.#_innerDate.toDate();
     }
 
     /**
@@ -784,8 +821,8 @@ export class DateTime {
      * @return {string} an ISO String for this DateTime. Either at UTC or at its own timezone
      */
     toISOString(useUtc = false) {
-        if (!this.isValid) return this._innerDate.toString();
-        return this._innerDate.toISOString(!useUtc).replace(/\+00:00$/, 'Z');
+        if (!this.isValid) return this.#_innerDate.toString();
+        return this.#_innerDate.toISOString(!useUtc).replace(/\+00:00$/, 'Z');
     }
 
     /**
@@ -794,8 +831,8 @@ export class DateTime {
      * @return {string} an string in the DateTime format
      */
     toJSON() {
-        if (!this.isValid) return this._innerDate.toString();
-        return this._innerDate.toISOString();
+        if (!this.isValid) return this.#_innerDate.toString();
+        return this.#_innerDate.toISOString();
     }
 
     /**
@@ -813,7 +850,7 @@ export class DateTime {
      * @returns {number} the timestamp for this DateTime
      */
     toTimestamp() {
-        return this._innerDate.valueOf();
+        return this.#_innerDate.valueOf();
     }
 
     /**
@@ -821,7 +858,7 @@ export class DateTime {
      * @returns an plain JS object representing this DateTime.
      */
     toObject() {
-        const obj = this._innerDate.toObject();
+        const obj = this.#_innerDate.toObject();
         return {
             year: obj.years,
             month: obj.months + 1,
@@ -836,7 +873,7 @@ export class DateTime {
     }
 
     /**
-     * Return a debug string 
+     * Return a debug string
      * @returns {string}
      * @example
      * ````javascript

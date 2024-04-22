@@ -1,13 +1,32 @@
 import type {Moment, unitOfTime} from 'moment-timezone';
 
-import { LOCALE_FORMATS } from './locale-formats.mts';
-export { LOCALE_FORMATS } from './locale-formats.mts';
+import {LOCALE_FORMATS} from './locale-formats.mts';
+export {LOCALE_FORMATS} from './locale-formats.mts';
 
 export type AnyDate = Date | Moment | DateOnly | DateTime | Partial<DateOnlyLike> | Partial<DateTimeLike> | string | number;
 
 export type DateOnlyLike = Pick<DateOnly, 'year' | 'month' | 'day'>;
 export type DiffUnit = unitOfTime.Diff;
-export type DateOnlyStartOfUnit = 'year' | 'years' | 'y' | 'month' | 'months' | 'M' | 'week' | 'weeks' | 'w' | 'quarter' | 'quarters' | 'Q' | 'isoWeek' | 'isoWeeks' | 'W' | 'day' | 'days' | 'd' | 'D';
+export type DateOnlyStartOfUnit =
+    | 'year'
+    | 'years'
+    | 'y'
+    | 'month'
+    | 'months'
+    | 'M'
+    | 'week'
+    | 'weeks'
+    | 'w'
+    | 'quarter'
+    | 'quarters'
+    | 'Q'
+    | 'isoWeek'
+    | 'isoWeeks'
+    | 'W'
+    | 'day'
+    | 'days'
+    | 'd'
+    | 'D';
 export type DateOnlyEndOfUnit = DateOnlyStartOfUnit;
 export type DateOnlyAddUnit = DateOnlyStartOfUnit;
 export type DateOnlySubtractUnit = DateOnlyAddUnit;
@@ -112,7 +131,7 @@ export class DateOnly {
      * @returns the item wich the value is the minumum from the set
      */
     static min<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
-    
+
     /**
      * Return the max from a set of dates. Invalid values are not considered.
      * If the set is empty or there is no valid value then it returns `undefined`.
@@ -293,7 +312,7 @@ export class DateOnly {
      */
     set quarter(value: number);
 
-    /** 
+    /**
      * Always return true to a DateOnly object
      * @returns whether this date is at the UTC timezone or not
      */
@@ -480,7 +499,7 @@ export class DateOnly {
     toObject(): DateOnlyLike;
 
     /**
-     * Return a debug string 
+     * Return a debug string
      * @example
      * ````javascript
      * console.log(toDateTime('2023-04-15')); // Print: "DateOnly(2023-04-15)"
@@ -489,7 +508,8 @@ export class DateOnly {
     debug(): string;
 }
 
-export type DateTimeLike = Pick<DateTime, 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'> & Partial<Pick<DateTime, 'timezone' | 'offset'>>;
+export type DateTimeLike = Pick<DateTime, 'year' | 'month' | 'day' | 'hour' | 'minute' | 'second' | 'millisecond'> &
+    Partial<Pick<DateTime, 'timezone' | 'offset'>>;
 export type DateTimeDiffUnit = unitOfTime.Diff;
 export type DateTimeStartOfUnit = unitOfTime.StartOf;
 export type DateTimeEndOfUnit = DateTimeStartOfUnit;
@@ -596,7 +616,7 @@ export class DateTime {
      * @returns the item wich the value is the minumum from the set
      */
     static min<T extends AnyDate | null | undefined>(...dates: T[]): T | undefined;
-    
+
     /**
      * Return the max from a set of dates. Invalid values are not considered.
      * If the set is empty or there is no valid value then it returns `undefined`.
@@ -638,7 +658,7 @@ export class DateTime {
      * @param date any moment date
      * @param locale optional locale if provided
      */
-    static fromMomentDate(date: Moment, locale?: string): DateTime
+    static fromMomentDate(date: Moment, locale?: string): DateTime;
 
     /**
      * Construct a new date-time from a plain js Date
@@ -821,7 +841,7 @@ export class DateTime {
      */
     set millisecond(value: number);
 
-    /** 
+    /**
      * @returns whether this date is at the UTC timezone or not
      */
     get isUTC(): true;
@@ -1025,7 +1045,7 @@ export class DateTime {
     toObject(): DateTimeLike;
 
     /**
-     * Return a debug string 
+     * Return a debug string
      * @example
      * ````javascript
      * console.log(toDateTime('2023-04-15').debug()); // Print: "DateTime(2023-04-15T00:00:00.000Z)"
@@ -1035,7 +1055,7 @@ export class DateTime {
     debug(): string;
 }
 
-export type DateFormatingOptions = { locale?: string | boolean; toISOForm?: boolean; format?: string; };
+export type DateFormatingOptions = {locale?: string | boolean; toISOForm?: boolean; format?: string};
 
 /**
  * Extract the locale from a date value.
@@ -1066,7 +1086,6 @@ export function toJsDate(anyDate: AnyDate): Date;
  * @returns a plain JS Date object or undefined if the input is null or undefined
  */
 export function toJsDate(anyDate: AnyDate | null | undefined): Date | undefined;
-
 
 export interface ToDateOnly {
     /**
@@ -1152,7 +1171,7 @@ export const toDateTime: ToDateTime;
  * @param options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
  * @returns the formatted date string
  */
-export function formatToDateOnly(anyDate: AnyDate, options?: { includeTimeAndZone?: boolean; }): string;
+export function formatToDateOnly(anyDate: AnyDate, options?: {includeTimeAndZone?: boolean}): string;
 /**
  * Format a date to a date-only format but without applying locale
  * @param anyDate any possible date
@@ -1160,7 +1179,7 @@ export function formatToDateOnly(anyDate: AnyDate, options?: { includeTimeAndZon
  * @param options.includeTimeAndZone optional flag for when toISOForm is enabled. It overrides the ISOString pattern to be a full ISOString which includes the time and zone as well.
  * @returns the formatted date string or undefined
  */
-export function formatToDateOnly(anyDate: AnyDate | null | undefined, options?: { includeTimeAndZone?: boolean; }): string | undefined;
+export function formatToDateOnly(anyDate: AnyDate | null | undefined, options?: {includeTimeAndZone?: boolean}): string | undefined;
 
 /**
  * Format a date to a date-time format but without applying locale
@@ -1183,7 +1202,7 @@ export function formatToDateTime(anyDate: AnyDate | null | undefined): string | 
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale
  */
-export function formatToDateOnlyWithLocale(anyDate: AnyDate, options?: { locale?: string; format?: string; }): string;
+export function formatToDateOnlyWithLocale(anyDate: AnyDate, options?: {locale?: string; format?: string}): string;
 /**
  * Format a date to a date-only ormat applying locale
  * @param anyDate any possible date
@@ -1192,7 +1211,7 @@ export function formatToDateOnlyWithLocale(anyDate: AnyDate, options?: { locale?
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale or undefined
  */
-export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string | undefined;
+export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, options?: {locale?: string; format?: string}): string | undefined;
 
 /**
  * Format a date to a date-time format applying locale
@@ -1202,7 +1221,7 @@ export function formatToDateOnlyWithLocale(anyDate: AnyDate | null | undefined, 
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale
  */
-export function formatToDateTimeWithLocale(anyDate: AnyDate, options?: { locale?: string; format?: string; }): string;
+export function formatToDateTimeWithLocale(anyDate: AnyDate, options?: {locale?: string; format?: string}): string;
 /**
  * Format a date to a date-time format applying locale
  * @param anyDate any possible date
@@ -1211,4 +1230,4 @@ export function formatToDateTimeWithLocale(anyDate: AnyDate, options?: { locale?
  * @param options.format optional format string pattern. Defaults to `LOCALE_FORMATS.VERBAL_DATE_TIME_LONG`. @see `LOCALE_FORMATS`
  * @returns the formatted date string applying the locale or undefined
  */
-export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, options?: { locale?: string; format?: string; }): string | undefined;
+export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, options?: {locale?: string; format?: string}): string | undefined;

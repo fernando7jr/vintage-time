@@ -2,7 +2,7 @@ const moment = require('moment-timezone');
 
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
-const {toDateOnly, toDateTime, isDateValid, formatToDateTime,} = require('../index.cjs');
+const {toDateOnly, toDateTime, isDateValid, formatToDateTime} = require('../index.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_LOCALE = 'en';
@@ -64,14 +64,7 @@ describe('DateOnly', () => {
                 '2023-01-02',
                 '2023-01-02T23:59:59.999Z',
             ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateOnly.isEqual(a, b);
 
@@ -122,14 +115,7 @@ describe('DateOnly', () => {
                 '2023-01-02',
                 '2023-01-02T23:59:59.999Z',
             ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateOnly.isEqualOrBefore(a, b);
 
@@ -183,14 +169,7 @@ describe('DateOnly', () => {
                 '2023-01-02',
                 '2023-01-02T23:59:59.999Z',
             ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateOnly.isEqualOrAfter(a, b);
 
@@ -244,14 +223,7 @@ describe('DateOnly', () => {
                 '2023-01-02',
                 '2023-01-02T23:59:59.999Z',
             ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateOnly.isBefore(a, b);
 
@@ -299,14 +271,7 @@ describe('DateOnly', () => {
                 '2023-01-02',
                 '2023-01-02T23:59:59.999Z',
             ];
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const compareFn = (a, b) => DateOnly.isAfter(a, b);
 
@@ -340,14 +305,7 @@ describe('DateOnly', () => {
         });
 
         describe('isEqualOrBeforeNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateOnly.now();
             const compareFn = (a) => DateOnly.isEqualOrBeforeNow(a);
@@ -372,14 +330,7 @@ describe('DateOnly', () => {
         });
 
         describe('isEqualOrAfterNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateOnly.now();
             const compareFn = (a) => DateOnly.isEqualOrAfterNow(a);
@@ -404,14 +355,7 @@ describe('DateOnly', () => {
         });
 
         describe('isBeforeNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateOnly.now();
             const compareFn = (a) => DateOnly.isBeforeNow(a);
@@ -436,14 +380,7 @@ describe('DateOnly', () => {
         });
 
         describe('isAfterNow', () => {
-            const invalidDates = [
-                DateOnly.invalid(),
-                DateTime.invalid(),
-                null,
-                undefined,
-                '2023-02-31',
-                '9999-44-99',
-            ]
+            const invalidDates = [DateOnly.invalid(), DateTime.invalid(), null, undefined, '2023-02-31', '9999-44-99'];
 
             const NOW = DateOnly.now();
             const compareFn = (a) => DateOnly.isAfterNow(a);
@@ -514,6 +451,7 @@ describe('DateOnly', () => {
                 expect(now.valueOf()).toBeNaN();
                 expect(now.toString()).toBe('Invalid date');
                 expect(now.toJSON()).toBe('Invalid date');
+                expect(now.toISOString()).toBe('Invalid date');
                 expect(now.isValid).toBe(false);
             });
         });
@@ -543,8 +481,8 @@ describe('DateOnly', () => {
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
-            it('should construct from a momentjs instance with a custom locale', () => {
-                const value = moment('2023-09-05');
+            it('should construct from a momentjs constructor param', () => {
+                const value = '2023-09-05';
                 const result = DateOnly.fromMomentDate(value, CUSTOM_LOCALE);
                 expect(result.toObject()).toEqual({
                     year: 2023,
@@ -558,9 +496,10 @@ describe('DateOnly', () => {
             it('should construct an invalid date', () => {
                 const result = [
                     DateOnly.fromMomentDate(moment.invalid()),
+                    DateOnly.fromMomentDate(NaN),
                     DateOnly.fromMomentDate(moment.invalid(), CUSTOM_LOCALE),
                 ];
-                expect(result.map(isDateValid)).toEqual([false, false]);
+                expect(result.map(isDateValid)).toEqual([false, false, false]);
             });
         });
 
@@ -665,7 +604,15 @@ describe('DateOnly', () => {
 
             it('should construct from a object with date properties with a custom locale', () => {
                 const result = DateOnly.fromDateTime(
-                    {year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248},
+                    {
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    },
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -679,7 +626,15 @@ describe('DateOnly', () => {
 
             it('should construct from a DateTime string', () => {
                 const result = DateOnly.fromDateTime(
-                    formatToDateTime({year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248}),
+                    formatToDateTime({
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    }),
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -759,7 +714,15 @@ describe('DateOnly', () => {
 
             it('should construct from a object with date properties with a custom locale', () => {
                 const result = DateOnly.fromDateOnly(
-                    {year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248},
+                    {
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    },
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -772,10 +735,7 @@ describe('DateOnly', () => {
             });
 
             it('should construct an invalid date', () => {
-                const result = [
-                    DateOnly.fromDateOnly(DateOnly.invalid()),
-                    DateOnly.fromDateOnly(DateOnly.invalid(), CUSTOM_LOCALE),
-                ];
+                const result = [DateOnly.fromDateOnly(DateOnly.invalid()), DateOnly.fromDateOnly(DateOnly.invalid(), CUSTOM_LOCALE)];
                 expect(result.map(isDateValid)).toEqual([false, false]);
             });
 
@@ -799,8 +759,8 @@ describe('DateOnly', () => {
             it('should fallback to Object.toString method', () => {
                 const result = DateOnly.fromDateOnly({
                     toString() {
-                        return '2020-02-01T00:00:00.000Z'
-                    }
+                        return '2020-02-01T00:00:00.000Z';
+                    },
                 });
                 expect(result).toBeInstanceOf(DateOnly);
                 expect(result.isDateOnly).toBe(true);
@@ -850,6 +810,18 @@ describe('DateOnly', () => {
                     day: 5,
                 });
                 expect(result.toJSON()).toBe('2023-09-05');
+                expect(result.locale).toEqual(DEFAULT_LOCALE);
+            });
+
+            it('should construct from a localised date string', () => {
+                const value = 'Mon Apr 22 2024 14:47:30 GMT+0300';
+                const result = DateOnly.fromAnyDate(value);
+                expect(result.toObject()).toEqual({
+                    year: 2024,
+                    month: 4,
+                    day: 22,
+                });
+                expect(result.toJSON()).toBe('2024-04-22');
                 expect(result.locale).toEqual(DEFAULT_LOCALE);
             });
 
@@ -1189,7 +1161,15 @@ describe('DateOnly', () => {
 
             it('should construct from a object with date properties with a custom locale', () => {
                 const result = DateOnly.fromAnyDate(
-                    {year: 2020, month: 10, day: 27, hour: 9, minute: 48, second: 59, milliseconds: 248},
+                    {
+                        year: 2020,
+                        month: 10,
+                        day: 27,
+                        hour: 9,
+                        minute: 48,
+                        second: 59,
+                        milliseconds: 248,
+                    },
                     CUSTOM_LOCALE
                 );
                 expect(result.toObject()).toEqual({
@@ -1262,10 +1242,7 @@ describe('DateOnly', () => {
             });
 
             it('should fail to parse and return an invalid date', () => {
-                const result = [
-                    DateOnly.fromFormat('1998-02-11', 'MM/DD/YYYY'),
-                    DateOnly.fromFormat('1998-02-11', 'MM/DD/YYYY', CUSTOM_LOCALE),
-                ];
+                const result = [DateOnly.fromFormat('1998-02-11', 'MM/DD/YYYY'), DateOnly.fromFormat('1998-02-11', 'MM/DD/YYYY', CUSTOM_LOCALE)];
                 expect(result.map(isDateValid)).toEqual([false, false]);
             });
         });
@@ -1282,10 +1259,7 @@ describe('DateOnly', () => {
         describe('locale', () => {
             it('should get locale', () => {
                 const defaultLocaleValues = [DateOnly.now(), DateOnly.invalid(), DateOnly.fromAnyDate('2025-12-17')];
-                const customLocaleValues = [
-                    DateOnly.now(CUSTOM_LOCALE),
-                    DateOnly.fromAnyDate('2025-12-17', CUSTOM_LOCALE),
-                ];
+                const customLocaleValues = [DateOnly.now(CUSTOM_LOCALE), DateOnly.fromAnyDate('2025-12-17', CUSTOM_LOCALE)];
                 expect(defaultLocaleValues.map((v) => v.locale)).toEqual(defaultLocaleValues.map(() => DEFAULT_LOCALE));
                 expect(customLocaleValues.map((v) => v.locale)).toEqual(customLocaleValues.map(() => CUSTOM_LOCALE));
             });
@@ -1367,20 +1341,7 @@ describe('DateOnly', () => {
             });
         });
 
-        const UNUSED_TIME_UNITS = [
-            'hour',
-            'hours',
-            'h',
-            'minute',
-            'minutes',
-            'm',
-            'second',
-            'seconds',
-            's',
-            'millisecond',
-            'milliseconds',
-            'ms',
-        ];
+        const UNUSED_TIME_UNITS = ['hour', 'hours', 'h', 'minute', 'minutes', 'm', 'second', 'seconds', 's', 'millisecond', 'milliseconds', 'ms'];
         describe('startOf', () => {
             const dateOnly = toDateOnly('2029-08-23');
             it.each(['year', 'years', 'y'])('should set date to start of %s', (unit) => {
@@ -1423,15 +1384,12 @@ describe('DateOnly', () => {
                 });
             });
 
-            it.each(['day', 'days', 'd', 'D', ...UNUSED_TIME_UNITS])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateOnly.startOf(unit);
-                    expect(result.toString()).toEqual(dateOnly.toString());
-                    expect(result.toObject()).toEqual(result.toObject());
-                    expect(result.toTimestamp()).toEqual(result.toTimestamp());
-                }
-            );
+            it.each(['day', 'days', 'd', 'D', ...UNUSED_TIME_UNITS])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateOnly.startOf(unit);
+                expect(result.toString()).toEqual(dateOnly.toString());
+                expect(result.toObject()).toEqual(result.toObject());
+                expect(result.toTimestamp()).toEqual(result.toTimestamp());
+            });
         });
 
         describe('endOf', () => {
@@ -1476,15 +1434,12 @@ describe('DateOnly', () => {
                 });
             });
 
-            it.each(['day', 'days', 'd', 'D', ...UNUSED_TIME_UNITS])(
-                'should have no effect when settting the date to start of %s',
-                (unit) => {
-                    const result = dateOnly.endOf(unit);
-                    expect(result.toString()).toEqual(dateOnly.toString());
-                    expect(result.toObject()).toEqual(result.toObject());
-                    expect(result.toTimestamp()).toEqual(result.toTimestamp());
-                }
-            );
+            it.each(['day', 'days', 'd', 'D', ...UNUSED_TIME_UNITS])('should have no effect when settting the date to start of %s', (unit) => {
+                const result = dateOnly.endOf(unit);
+                expect(result.toString()).toEqual(dateOnly.toString());
+                expect(result.toObject()).toEqual(result.toObject());
+                expect(result.toTimestamp()).toEqual(result.toTimestamp());
+            });
         });
 
         describe('plus', () => {
@@ -1512,6 +1467,8 @@ describe('DateOnly', () => {
                 let result = dateOnly.plus(7, null);
                 expect(result.equals(dateOnly)).toBe(true);
                 result = dateOnly.plus({clocks: 9});
+                expect(result.equals(dateOnly)).toBe(true);
+                result = dateOnly.plus({months: 0});
                 expect(result.equals(dateOnly)).toBe(true);
             });
         });
@@ -1541,6 +1498,8 @@ describe('DateOnly', () => {
                 let result = dateOnly.minus(7, null);
                 expect(result.equals(dateOnly)).toBe(true);
                 result = dateOnly.minus({clocks: 9});
+                expect(result.equals(dateOnly)).toBe(true);
+                result = dateOnly.minus({months: 0});
                 expect(result.equals(dateOnly)).toBe(true);
             });
         });
@@ -1601,7 +1560,7 @@ describe('DateOnly', () => {
                 week: Math.abs(dateA.week - dateB.week),
                 quarter: Math.abs(dateA.quarter - dateB.quarter),
             };
-    
+
             it.each(Object.keys(properties))('should get the difference in %ss', (prop) => {
                 const diffAmount = properties[prop];
                 expect(dateA.diff(dateB, prop)).toEqual(!diffAmount ? 0 : -diffAmount);
@@ -1660,7 +1619,7 @@ describe('DateOnly', () => {
                 let result = dateOnly.set(7, null);
                 expect(result.equals(dateOnly)).toBe(true);
                 expect(result.toObject()).toEqual(dateObj);
-                result = dateOnly.plus({clocks: 9});
+                result = dateOnly.set({clocks: 9});
                 expect(result.equals(dateOnly)).toBe(true);
                 expect(result.toObject()).toEqual(dateObj);
             });
@@ -1676,19 +1635,50 @@ describe('DateOnly', () => {
             expect(jsDate instanceof DateOnly).toBe(false);
             expect(DateOnly.isDateOnly(jsDate)).toBe(false);
             expect(jsDate.toISOString()).toEqual(dateOnly.toISOString());
-            expect({year: jsDate.getFullYear(), month: jsDate.getMonth() + 1, day: jsDate.getDate()}).toEqual(
-                dateOnly.toObject()
-            );
+            expect({
+                year: jsDate.getFullYear(),
+                month: jsDate.getMonth() + 1,
+                day: jsDate.getDate(),
+            }).toEqual(dateOnly.toObject());
         });
-        
+
         it('should contain replace, startsWith and endsWith methods which are used by sequelize', () => {
             const dateOnly = DateOnly.now();
             const dateString = dateOnly.toJSON();
-            expect(dateOnly.replace('\'', '')).toEqual(dateString);
+            expect(dateOnly.replace("'", '')).toEqual(dateString);
             expect(dateOnly.startsWith(dateString)).toBe(true);
             expect(dateOnly.startsWith(dateString[0])).toBe(true);
             expect(dateOnly.endsWith(dateString)).toBe(true);
             expect(dateOnly.endsWith(dateString.at(-1))).toBe(true);
+        });
+
+        it('should be correctly asserted using expect.toEqual', () => {
+            const dateOnly1 = toDateOnly('2023-01-02');
+            const dateOnly2 = toDateOnly({year: 2023, month: 1, day: 2});
+            const dateOnly3 = toDateOnly('2023-01-02T00:00:00Z');
+            const dateOnly4 = toDateOnly(moment.utc('2023-01-02T00:00:00Z'));
+            const dateOnly5 = toDateOnly(new Date('2023-01-02T00:00:00.000Z'));
+            expect(dateOnly1).toEqual(dateOnly1.clone());
+            expect(dateOnly2).toEqual(dateOnly2.clone());
+            expect(dateOnly3).toEqual(dateOnly3.clone());
+            expect(dateOnly4).toEqual(dateOnly4.clone());
+            expect(dateOnly5).toEqual(dateOnly5.clone());
+            expect(dateOnly5).toEqual(dateOnly5.clone());
+            expect(dateOnly1).toEqual(dateOnly2);
+            expect(dateOnly1).toEqual(dateOnly3);
+            expect(dateOnly1).toEqual(dateOnly4);
+            expect(dateOnly1).toEqual(dateOnly5);
+            expect(dateOnly1.toJSON()).toEqual(dateOnly2.toJSON());
+            expect(dateOnly1.toJSON()).toEqual(dateOnly3.toJSON());
+            expect(dateOnly1.toJSON()).toEqual(dateOnly4.toJSON());
+            expect(dateOnly1.toJSON()).toEqual(dateOnly5.toJSON());
+            expect(dateOnly1.toObject()).toEqual(dateOnly2.toObject());
+            expect(dateOnly1.toObject()).toEqual(dateOnly3.toObject());
+            expect(dateOnly1.toObject()).toEqual(dateOnly4.toObject());
+            expect(dateOnly1.toObject()).toEqual(dateOnly5.toObject());
+            expect(dateOnly2).toEqual(dateOnly3);
+            expect(dateOnly2).toEqual(dateOnly4);
+            expect(dateOnly3).toEqual(dateOnly4);
         });
 
         it('should be correctly asserted using expect.toMatchObject', () => {

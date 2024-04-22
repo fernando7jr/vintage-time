@@ -10,7 +10,7 @@ function isSequelizeMethod(value) {
 
 export class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
     static get key() {
-        return 'VINTAGE_DATETIME'
+        return 'VINTAGE_DATETIME';
     }
 
     constructor(...args) {
@@ -28,7 +28,7 @@ export class DateOnlyDataType extends DataTypes.ABSTRACT.prototype.constructor {
 
 export class DateTimeDataType extends DataTypes.ABSTRACT.prototype.constructor {
     static get key() {
-        return 'VINTAGE_DATETIME'
+        return 'VINTAGE_DATETIME';
     }
 
     constructor(...args) {
@@ -48,34 +48,38 @@ if (!DataTypes.VINTAGE_DATEONLY) {
     DataTypes.VINTAGE_DATEONLY = Utils.classToInvokable(DateOnlyDataType);
     DataTypes.VINTAGE_DATEONLY.prototype.key = DataTypes.VINTAGE_DATEONLY.key;
     DataTypes.VINTAGE_DATEONLY.types = DataTypes.DATEONLY.types;
-    Object.keys(DataTypes.VINTAGE_DATEONLY.types).forEach(type => {
+    Object.keys(DataTypes.VINTAGE_DATEONLY.types).forEach((type) => {
         const typeImplementations = DataTypes[type];
-        typeImplementations.VINTAGE_DATEONLY = Utils.classToInvokable(class extends DateOnlyDataType {
-            constructor(...args) {
-                super(...args);
-            }
+        typeImplementations.VINTAGE_DATEONLY = Utils.classToInvokable(
+            class extends DateOnlyDataType {
+                constructor(...args) {
+                    super(...args);
+                }
 
-            toSql() {
-                return typeImplementations.DATEONLY.prototype.toSql.call(this);
+                toSql() {
+                    return typeImplementations.DATEONLY.prototype.toSql.call(this);
+                }
             }
-        });
+        );
     });
 }
 if (!DataTypes.VINTAGE_DATETIME) {
     DataTypes.VINTAGE_DATETIME = Utils.classToInvokable(DateTimeDataType);
     DataTypes.VINTAGE_DATETIME.prototype.key = DataTypes.VINTAGE_DATETIME.key;
     DataTypes.VINTAGE_DATETIME.types = DataTypes.DATE.types;
-    Object.keys(DataTypes.VINTAGE_DATETIME.types).forEach(type => {
+    Object.keys(DataTypes.VINTAGE_DATETIME.types).forEach((type) => {
         const typeImplementations = DataTypes[type];
-        typeImplementations.VINTAGE_DATETIME = Utils.classToInvokable(class extends DateTimeDataType {
-            constructor(...args) {
-                super(...args);
-            }
+        typeImplementations.VINTAGE_DATETIME = Utils.classToInvokable(
+            class extends DateTimeDataType {
+                constructor(...args) {
+                    super(...args);
+                }
 
-            toSql() {
-                return typeImplementations.DATE.prototype.toSql.call(this);
+                toSql() {
+                    return typeImplementations.DATE.prototype.toSql.call(this);
+                }
             }
-        });
+        );
     });
 }
 

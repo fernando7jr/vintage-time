@@ -16,13 +16,7 @@ describe('Joi Date Extensions', () => {
     describe('anyDate', () => {
         const schema = joi.anyDate().allow(null);
 
-        it.each([
-            '2023-01-01',
-            '1990-10-12',
-            '2023-01-01T00:00:00Z',
-            '2023-01-01 00:00:00Z',
-            '2023-01-01 00:00:00-03:00',
-        ])('should accept "%s"', (value) => {
+        it.each(['2023-01-01', '1990-10-12', '2023-01-01T00:00:00Z', '2023-01-01 00:00:00Z', '2023-01-01 00:00:00-03:00'])('should accept "%s"', (value) => {
             const result = validate(schema, value);
             expect(result.isValid).toBe(true);
             expect(result.value).toBeInstanceOf(DateTime);
@@ -35,12 +29,9 @@ describe('Joi Date Extensions', () => {
             expect(result.value).toEqual(value);
         });
 
-        it.each(['01/01/2000', '2000/01/01', '99-02-15', '2023-01-01 00:00:00', '2023-01-01 00:00:00', 1425215164236])(
-            'should reject "%s"',
-            (value) => {
-                expect(validate(schema, value)).toMatchObject({isValid: false});
-            }
-        );
+        it.each(['01/01/2000', '2000/01/01', '99-02-15', '2023-01-01 00:00:00', '2023-01-01 00:00:00', 1425215164236])('should reject "%s"', (value) => {
+            expect(validate(schema, value)).toMatchObject({isValid: false});
+        });
     });
 
     describe('dateOnly', () => {
@@ -77,18 +68,15 @@ describe('Joi Date Extensions', () => {
     describe('dateTime', () => {
         const schema = joi.dateTime().allow(null);
 
-        it.each([
-            '2023-01-01T00:00:00Z',
-            '2023-01-01T15:12:33.123Z',
-            '2023-01-01 00:00:00Z',
-            '2023-01-01 00:00:00-03:00',
-            '2023-01-01 00:00:00+03:00',
-        ])('should accept "%s"', (value) => {
-            const result = validate(schema, value);
-            expect(result.isValid).toBe(true);
-            expect(result.value).toBeInstanceOf(DateTime);
-            expect(result.value.valueOf()).toEqual(toDateTime(value).valueOf());
-        });
+        it.each(['2023-01-01T00:00:00Z', '2023-01-01T15:12:33.123Z', '2023-01-01 00:00:00Z', '2023-01-01 00:00:00-03:00', '2023-01-01 00:00:00+03:00'])(
+            'should accept "%s"',
+            (value) => {
+                const result = validate(schema, value);
+                expect(result.isValid).toBe(true);
+                expect(result.value).toBeInstanceOf(DateTime);
+                expect(result.value.valueOf()).toEqual(toDateTime(value).valueOf());
+            }
+        );
 
         it.each([null, undefined])('should accept "%s"', (value) => {
             const result = validate(schema, value);
@@ -96,17 +84,11 @@ describe('Joi Date Extensions', () => {
             expect(result.value).toEqual(value);
         });
 
-        it.each([
-            '2023-01-01T00:00:00',
-            '2023-01-01 00:00:00',
-            '01/01/2000',
-            '2000/01/01',
-            '99-02-15',
-            '2023-01-01',
-            '1990-10-12',
-            1425215164236,
-        ])('should reject "%s"', (value) => {
-            expect(validate(schema, value)).toMatchObject({isValid: false});
-        });
+        it.each(['2023-01-01T00:00:00', '2023-01-01 00:00:00', '01/01/2000', '2000/01/01', '99-02-15', '2023-01-01', '1990-10-12', 1425215164236])(
+            'should reject "%s"',
+            (value) => {
+                expect(validate(schema, value)).toMatchObject({isValid: false});
+            }
+        );
     });
 });

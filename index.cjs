@@ -115,11 +115,9 @@ function __formatToDateOnly(anyDate, options) {
         return includeTimeAndZone ? dateOnly.toISOString() : dateOnly.toJSON();
     }
 
-    const shouldApplyLocale = Boolean(options.locale);
     const locale = (() => {
-        if (!shouldApplyLocale) return undefined;
         const {locale} = options;
-        if (typeof locale === 'string') return locale;
+        if (!locale || typeof locale === 'string') return locale;
         throw new Error('Locale must be an string');
     })();
     const dateOnly = toDateOnly(anyDate, locale);
@@ -141,11 +139,9 @@ function __formatToDateTime(anyDate, options) {
         return toDateTime(anyDate).toISOString(true);
     }
 
-    const shouldApplyLocale = Boolean(options.locale);
     const locale = (() => {
-        if (!shouldApplyLocale) return undefined;
         const {locale} = options;
-        if (typeof locale === 'string') return locale;
+        if (!locale || typeof locale === 'string') return locale;
         throw new Error('Locale must be an string');
     })();
     const dateTime = toDateTime(anyDate, locale);
@@ -160,8 +156,7 @@ function __formatToDateTime(anyDate, options) {
  * @returns {string | undefined}
  */
 function formatToDateOnly(anyDate, options) {
-    const {includeTimeAndZone = false} = options || {};
-    return __formatToDateOnly(anyDate, {locale: false, toISOForm: true, includeTimeAndZone});
+    return __formatToDateOnly(anyDate, {toISOForm: true, includeTimeAndZone: options?.includeTimeAndZone});
 }
 
 /**
@@ -170,7 +165,7 @@ function formatToDateOnly(anyDate, options) {
  * @returns {string | undefined}
  */
 function formatToDateTime(anyDate) {
-    return __formatToDateTime(anyDate, {locale: false, toISOForm: true});
+    return __formatToDateTime(anyDate, {toISOForm: true});
 }
 
 /**
@@ -182,8 +177,8 @@ function formatToDateTime(anyDate) {
  * @returns {string | undefined}
  */
 function formatToDateOnlyWithLocale(anyDate, options) {
-    const {locale, format} = options || {};
-    return __formatToDateOnly(anyDate, {locale: locale || true, format});
+    const {locale = true, format} = options || {};
+    return __formatToDateOnly(anyDate, {locale, format});
 }
 
 /**
