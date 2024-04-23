@@ -320,6 +320,7 @@ describe('Date sequelize utils', () => {
             order: [['id', 'ASC']],
         });
         expect(getPlainObject(result)).toEqual(expected);
+        expect(getPlainObject(result.map((r) => r.toJSON()))).toEqual(expected);
     });
 
     it('should get and set properties to null or undefined', () => {

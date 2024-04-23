@@ -535,7 +535,7 @@ class DateOnly {
      * @param {boolean} allowDays flag whether days unit of time are allowed or not
      * @returns {StartOfUnit | EndOfUnit | ''}
      */
-    #resolveUnitOfTime(unitOfTime, {allowDays = false, allowIsoWeeks = true} = {}) {
+    _resolveUnitOfTime(unitOfTime, {allowDays = false, allowIsoWeeks = true} = {}) {
         if (allowDays && DAYS_UNITS.has(unitOfTime)) return unitOfTime;
         return ALLOWED_UNITS.has(unitOfTime) ? unitOfTime : '';
     }
@@ -546,7 +546,7 @@ class DateOnly {
      * @returns {DateOnly} new DateOnly object at the start of `unitOfTime`
      */
     startOf(unitOfTime) {
-        unitOfTime = this.#resolveUnitOfTime(unitOfTime);
+        unitOfTime = this._resolveUnitOfTime(unitOfTime);
         return DateOnly.fromMomentDate(moment(this._innerDate).startOf(unitOfTime));
     }
 
@@ -556,7 +556,7 @@ class DateOnly {
      * @returns {DateOnly} new DateOnly object at the end of `unitOfTime`
      */
     endOf(unitOfTime) {
-        unitOfTime = this.#resolveUnitOfTime(unitOfTime);
+        unitOfTime = this._resolveUnitOfTime(unitOfTime);
         return DateOnly.fromMomentDate(moment(this._innerDate).endOf(unitOfTime));
     }
 
@@ -586,7 +586,7 @@ class DateOnly {
 
         const duration = {};
         for (const key in amountOrDuration) {
-            if (!this.#resolveUnitOfTime(key, {allowDays: true})) continue;
+            if (!this._resolveUnitOfTime(key, {allowDays: true})) continue;
             const amount = amountOrDuration?.[key];
             if (!amount) continue;
             duration[key] = amount;
@@ -621,7 +621,7 @@ class DateOnly {
 
         const duration = {};
         for (const key in amountOrDuration) {
-            if (!this.#resolveUnitOfTime(key, {allowDays: true})) continue;
+            if (!this._resolveUnitOfTime(key, {allowDays: true})) continue;
             const amount = amountOrDuration?.[key];
             if (!amount) continue;
             duration[key] = amount;
@@ -661,7 +661,7 @@ class DateOnly {
         for (const sourceKey in amountOrDuration) {
             let targetKey = sourceKey;
             if (DATE_KEYS.has(sourceKey.toLowerCase())) targetKey = 'date';
-            else if (!this.#resolveUnitOfTime(sourceKey, {allowDays: true})) continue;
+            else if (!this._resolveUnitOfTime(sourceKey, {allowDays: true})) continue;
 
             let amount = amountOrDuration?.[sourceKey];
             if (MONTH_KEYS.has(targetKey)) amount -= 1;
