@@ -46,9 +46,40 @@ function __getObjectValue(value) {
     }
 }
 
+/**
+ * Construct a Moment date object from a DateTime
+ * @param {DateTime} dateTime
+ */
+function _momentDate(dateOnly) {
+    return moment.utc({year: dateOnly._year, month: dateOnly._month - 1, date: dateOnly._day}).locale(dateOnly._locale);
+}
+
+/**
+ * Copy a moment date object properties
+ * @param {DateTime} dateOnly
+ * @param {Moment} momentDate
+ */
+function _copyMomentDate(dateOnly, momentDate) {
+    if (!momentDate.isValid()) {
+        dateOnly._year = NaN;
+        dateOnly._month = NaN;
+        dateOnly._day = NaN;
+    } else {
+        dateOnly._year = momentDate.year();
+        dateOnly._month = momentDate.month() + 1;
+        dateOnly._day = momentDate.date();
+    }
+}
+
 class DateOnly {
-    /** @type {Moment} */
-    _innerDate;
+    /** @type {number} */
+    _year;
+    /** @type {number} */
+    _month;
+    /** @type {number} */
+    _day;
+    /** @type {string|null} */
+    _locale = null;
 
     /**
      * Check if the value is DateOnly instance
@@ -236,7 +267,7 @@ class DateOnly {
      * ```
      */
     static invalid() {
-        return new DateOnly(moment(NaN));
+        return new DateOnly(NaN);
     }
 
     /**
@@ -303,7 +334,7 @@ class DateOnly {
      */
     static fromDateOnly(dateOnly, locale) {
         if (dateOnly instanceof DateOnly) {
-            return this.fromMomentDate(dateOnly._innerDate, locale);
+            return new DateOnly(dateOnly, locale || dateOnly._locale);
         } else if (typeof dateOnly === 'string') {
             return this.fromMomentDate(moment.tz(dateOnly, 'UTC'), locale);
         } else if (__isDateOnlyObject(dateOnly)) {
@@ -363,8 +394,14 @@ class DateOnly {
      * @private prefer to use any of the static methods instead
      */
     constructor(date, locale) {
-        this._innerDate = moment.utc(date, true).startOf('day');
-        if (locale) this._innerDate = this._innerDate.locale(locale);
+        this._locale = locale ?? moment().locale();
+        if (date instanceof DateOnly) {
+            this._year = date._year;
+            this._month = date._month;
+            this._day = date._day;
+        } else {
+            _copyMomentDate(this, moment(date));
+        }
     }
 
     get isDateOnly() {
@@ -376,7 +413,7 @@ class DateOnly {
      * @returns {string} the locale set to this date. Defaults to the global locale if none was provided
      */
     get locale() {
-        return this._innerDate.locale();
+        return this._locale;
     }
 
     /**
@@ -385,7 +422,7 @@ class DateOnly {
      * @returns {number}
      */
     get year() {
-        return this._innerDate.year();
+        return this._year;
     }
 
     /**
@@ -394,7 +431,7 @@ class DateOnly {
      * @param {number} value
      */
     set year(value) {
-        this._innerDate = this._innerDate.year(value);
+        _copyMomentDate(this, _momentDate(this).year(value));
     }
 
     /**
@@ -403,7 +440,7 @@ class DateOnly {
      * @returns {number}
      */
     get month() {
-        return this._innerDate.month() + 1;
+        return this._month;
     }
 
     /**
@@ -412,7 +449,7 @@ class DateOnly {
      * @param {number} value
      */
     set month(value) {
-        this._innerDate.month(value - 1);
+        _copyMomentDate(this, _momentDate(this).month(value - 1));
     }
 
     /**
@@ -421,7 +458,7 @@ class DateOnly {
      * @returns {number}
      */
     get day() {
-        return this._innerDate.date();
+        return this._day;
     }
 
     /**
@@ -430,7 +467,7 @@ class DateOnly {
      * @param {number} value
      */
     set day(value) {
-        this._innerDate = this._innerDate.date(value);
+        _copyMomentDate(this, _momentDate(this).date(value));
     }
 
     /**
@@ -438,7 +475,7 @@ class DateOnly {
      * @returns {number}
      */
     get week() {
-        return this._innerDate.week();
+        return _momentDate(this).week();
     }
 
     /**
@@ -446,7 +483,7 @@ class DateOnly {
      * @param {number} value
      */
     set week(value) {
-        this._innerDate = this._innerDate.week(value);
+        _copyMomentDate(this, _momentDate(this).week(value));
     }
 
     /**
@@ -454,7 +491,7 @@ class DateOnly {
      * @returns {number}
      */
     get weekday() {
-        return this._innerDate.weekday();
+        return _momentDate(this).weekday();
     }
 
     /**
@@ -462,7 +499,7 @@ class DateOnly {
      * @param {number} value
      */
     set weekday(value) {
-        this._innerDate = this._innerDate.weekday(value);
+        _copyMomentDate(this, _momentDate(this).weekday(value));
     }
 
     /**
@@ -470,7 +507,7 @@ class DateOnly {
      * @returns {number}
      */
     get dayOfYear() {
-        return this._innerDate.dayOfYear();
+        return _momentDate(this).dayOfYear();
     }
 
     /**
@@ -478,7 +515,7 @@ class DateOnly {
      * @param {number} value
      */
     set dayOfYear(value) {
-        this._innerDate = this._innerDate.dayOfYear(value);
+        _copyMomentDate(this, _momentDate(this).dayOfYear(value));
     }
 
     /**
@@ -486,7 +523,7 @@ class DateOnly {
      * @returns {number}
      */
     get quarter() {
-        return this._innerDate.quarter();
+        return _momentDate(this).quarter();
     }
 
     /**
@@ -494,7 +531,7 @@ class DateOnly {
      * @param {number} value
      */
     set quarter(value) {
-        this._innerDate = this._innerDate.quarter(value);
+        _copyMomentDate(this, _momentDate(this).quarter(value));
     }
 
     /**
@@ -510,14 +547,14 @@ class DateOnly {
      * @returns {boolean} true if this is a valid date, false otherwise
      */
     get isValid() {
-        return this._innerDate.isValid();
+        return !isNaN(this._year);
     }
 
     /**
      * @returns {boolean} true if this date year is a leap year, false otherwise
      */
     get isLeapYear() {
-        return this._innerDate.isLeapYear();
+        return _momentDate(this).isLeapYear();
     }
 
     /**
@@ -526,7 +563,7 @@ class DateOnly {
      * @returns {string} date string using the provided formatting
      */
     format(format = LOCALE_FORMATS.VERBAL_DATE_LONG) {
-        return this._innerDate.startOf('day').format(format);
+        return _momentDate(this).startOf('day').format(format);
     }
 
     /**
@@ -547,7 +584,7 @@ class DateOnly {
      */
     startOf(unitOfTime) {
         unitOfTime = this._resolveUnitOfTime(unitOfTime);
-        return DateOnly.fromMomentDate(moment(this._innerDate).startOf(unitOfTime));
+        return DateOnly.fromMomentDate(_momentDate(this).startOf(unitOfTime));
     }
 
     /**
@@ -557,7 +594,7 @@ class DateOnly {
      */
     endOf(unitOfTime) {
         unitOfTime = this._resolveUnitOfTime(unitOfTime);
-        return DateOnly.fromMomentDate(moment(this._innerDate).endOf(unitOfTime));
+        return DateOnly.fromMomentDate(_momentDate(this).endOf(unitOfTime));
     }
 
     /**
@@ -592,7 +629,7 @@ class DateOnly {
             duration[key] = amount;
         }
 
-        return DateOnly.fromMomentDate(moment(this._innerDate).add(duration));
+        return DateOnly.fromMomentDate(_momentDate(this).add(duration));
     }
 
     /**
@@ -627,7 +664,7 @@ class DateOnly {
             duration[key] = amount;
         }
 
-        return DateOnly.fromMomentDate(moment(this._innerDate).subtract(duration));
+        return DateOnly.fromMomentDate(_momentDate(this).subtract(duration));
     }
 
     /**
@@ -668,7 +705,7 @@ class DateOnly {
             duration[targetKey] = amount;
         }
 
-        this._innerDate.set(duration);
+        _copyMomentDate(this, _momentDate(this).set(duration));
         return this;
     }
 
@@ -683,7 +720,7 @@ class DateOnly {
     diff(date, unitOfTime, precise) {
         const dateOnly = DateOnly.fromAnyDate(date);
         if (!this.isValid || !dateOnly.isValid) throw new Error(`Can not subtract "${this.toJSON()}" from "${dateOnly.toJSON()}"`);
-        return this._innerDate.diff(dateOnly._innerDate, unitOfTime, precise);
+        return _momentDate(this).diff(_momentDate(dateOnly), unitOfTime, precise);
     }
 
     /**
@@ -691,7 +728,7 @@ class DateOnly {
      * @returns {DateOnly}
      */
     clone() {
-        return new DateOnly(this._innerDate, this.locale);
+        return new DateOnly(this, this._locale);
     }
 
     /**
@@ -721,7 +758,7 @@ class DateOnly {
      * @returns {Date} an equivalent JS Date object for this DateOnly value
      */
     toJsDate() {
-        return this._innerDate.toDate();
+        return _momentDate(this).toDate();
     }
 
     /**
@@ -730,7 +767,7 @@ class DateOnly {
      * @return {string} an ISO String for this DateOnly
      */
     toISOString() {
-        if (!this.isValid) return this._innerDate.toString();
+        if (!this.isValid) return _momentDate(this).toString();
         return `${this.toJSON()}T00:00:00.000Z`;
     }
 
@@ -739,7 +776,7 @@ class DateOnly {
      * @return {string} an string in the DateOnly format
      */
     toJSON() {
-        if (!this.isValid) return this._innerDate.toString();
+        if (!this.isValid) return _momentDate(this).toString();
         return this.format('YYYY-MM-DD');
     }
 
@@ -756,7 +793,7 @@ class DateOnly {
      * @returns {number} the timestamp for this DateOnly
      */
     toTimestamp() {
-        return this._innerDate.startOf('day').valueOf();
+        return _momentDate(this).startOf('day').valueOf();
     }
 
     /**
@@ -764,11 +801,10 @@ class DateOnly {
      * @returns an plain JS object representing this DateOnly.
      */
     toObject() {
-        const obj = this._innerDate.toObject();
         return {
-            year: obj.years,
-            month: obj.months + 1,
-            day: obj.date,
+            year: this._year,
+            month: this._month,
+            day: this._day,
         };
     }
 
