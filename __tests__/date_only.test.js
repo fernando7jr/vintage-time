@@ -1624,6 +1624,26 @@ describe('DateOnly', () => {
                 expect(result.toObject()).toEqual(dateObj);
             });
         });
+
+        describe('toObject', () => {
+            it('should convert to a plain object', () => {
+                const dateOnly = toDateOnly('2023-10-15');
+                expect(dateOnly.toObject()).toEqual({
+                    year: 2023,
+                    month: 10,
+                    day: 15,
+                });
+            });
+
+            it('should handle invalid dates', () => {
+                const dateOnly = DateOnly.invalid();
+                expect(dateOnly.toObject()).toEqual({
+                    year: NaN,
+                    month: NaN,
+                    day: NaN,
+                });
+            });
+        });
     });
 
     describe('compatibility', () => {
