@@ -10,6 +10,7 @@ const {
     formatToDateTime,
     formatToDateOnlyWithLocale,
     formatToDateTimeWithLocale,
+    convertDurationToTimeUnit,
     LOCALE_FORMATS,
     DateOnly,
     DateTime,
@@ -823,6 +824,12 @@ describe('Date & Locale utils', () => {
                 expect(error.message).toBe('Locale must be an string');
             }
         });
+
+        it('should use the format default options values', () => {
+            const stringValues = '2000-07-09T22:33:44.222+03:00';
+            const result = formatToDateOnlyWithLocale(stringValues)
+            expect(result).toBe('July 9, 2000')
+        });
     });
 
     describe('formatToDateTimeWithLocale', () => {
@@ -1048,6 +1055,31 @@ describe('Date & Locale utils', () => {
                 expect(error).toBeInstanceOf(Error);
                 expect(error.message).toBe('Locale must be an string');
             }
+        });
+
+        it('should use the format default options values', () => {
+            const stringValues = '2000-07-09T22:33:44.222+03:00';
+            const result = formatToDateTimeWithLocale(stringValues)
+            expect(result).toBe('July 9, 2000 10:33 PM')
+        });
+    });
+
+    describe('convertDurationToTimeUnit', () => {
+        it('should return NaN when the duration is invalid', () => {
+            const result = convertDurationToTimeUnit({years: NaN}, 'days');
+            expect(result).toBe(NaN);
+        });
+
+        it('should convert 1 year into months', () => {
+            const result = convertDurationToTimeUnit({years: 1}, 'months');
+            expect(result).toBe(12);
+        });
+
+        it('should convert 8 days into 1 week', () => {
+            let result = convertDurationToTimeUnit({days: 8}, 'weeks', false);
+            expect(result).toBe(1);
+            result = convertDurationToTimeUnit({days: 8}, 'weeks');
+            expect(result).toEqual(1.1428571428571428);
         });
     });
 });

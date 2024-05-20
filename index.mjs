@@ -181,7 +181,7 @@ export function formatToDateTime(anyDate) {
  */
 export function formatToDateOnlyWithLocale(anyDate, options) {
     const {locale, format} = options || {};
-    return __formatToDateOnly(anyDate, {locale: locale || true, format});
+    return __formatToDateOnly(anyDate, {locale: locale || moment().locale(), format});
 }
 
 /**
@@ -194,5 +194,21 @@ export function formatToDateOnlyWithLocale(anyDate, options) {
  */
 export function formatToDateTimeWithLocale(anyDate, options) {
     const {locale, format} = options || {};
-    return __formatToDateTime(anyDate, {locale: locale || true, format});
+    return __formatToDateTime(anyDate, {locale: locale || moment().locale(), format});
+}
+
+/**
+ * Convert a duration input into an specific time unit.
+ * Returns `NaN` when the duration is invalid.
+ * @param {moment.FromTo | moment.DurationInputObject} durationInput any valid duration input
+ * @param {moment.unitOfTime.Base} toTimeUnit the time unit to have the duration converted into
+ * @param {boolean} precise whether to return the precise result or round it to the nearest integer (`Math.floor` is used). Defaults to `true`
+ * @returns {number} the amount in the requested time unit. `NaN` when the duration is invalid.
+ */
+export function convertDurationToTimeUnit(durationInput, toTimeUnit, precise = true) {
+    const duration = moment.duration(durationInput);
+    if (!duration.isValid()) return NaN;
+    const result = duration.as(toTimeUnit);
+    if (precise) return result;
+    return Math.floor(result);
 }
