@@ -1,4 +1,4 @@
-import type {Moment, unitOfTime} from 'moment-timezone';
+import {Moment, FromTo, DurationInputObject, unitOfTime} from 'moment-timezone';
 
 import {LOCALE_FORMATS} from './locale-formats.cts';
 export {LOCALE_FORMATS} from './locale-formats.cts';
@@ -1231,3 +1231,13 @@ export function formatToDateTimeWithLocale(anyDate: AnyDate, options?: {locale?:
  * @returns the formatted date string applying the locale or undefined
  */
 export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, options?: {locale?: string; format?: string}): string | undefined;
+
+/**
+ * Convert a duration input into an specific time unit.
+ * Returns `NaN` when the duration is invalid.
+ * @param durationInput any valid duration input
+ * @param toTimeUnit the time unit to have the duration converted into
+ * @param precise whether to return the precise result or round it to the nearest integer (`Math.floor` is used). Defaults to `true`
+ * @returns the amount in the requested time unit. `NaN` when the duration is invalid.
+ */
+export function convertDurationToTimeUnit(durationInput: FromTo | DurationInputObject, toTimeUnit: unitOfTime.Base, precise = true): number;
