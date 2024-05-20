@@ -3,9 +3,26 @@ const moment = require('moment-timezone');
 const {DateOnly} = require('./date-only.cjs');
 const {DateTime} = require('./date-time.cjs');
 const {LOCALE_FORMATS} = require('./locale-formats.cjs');
+const {getLocalTimezone} = require('./utils/tz.cjs');
 
 /** @typedef {Date | import('moment-timezone').Moment | DateOnly | DateTime | string | number} AnyDate */
 /** @typedef {{locale?: string | boolean; toISOForm?: boolean; format?: string}} DateFormatingOptions */
+
+/**
+ * Get the default timezone.
+ * @returns {string} the default timezone name
+ */
+function getDefaultTimeZone() {
+    return moment().tz() || getLocalTimezone();
+}
+
+/**
+ * Set the default timezone to be used instead of the local timezone.
+ * @param {string | undefined} timezone the timezone to be set as the default one. `undefined` resets it to the local timezone.
+ */
+function setDefaultTimeZone(timezone) {
+    moment.tz.setDefault(timezone ?? undefined);
+}
 
 /**
  * Extract the locale from a date value.
@@ -96,6 +113,16 @@ toDateTime.now = (locale) => DateTime.now(locale);
  * @returns {DateTime | undefined}
  */
 toDateTime.tz = (anyDate, tz, locale) => toDateTime(anyDate, locale).toTimezone(tz);
+/**
+ * Convert a date value to DateTime object in a specific timezone but keeping the local time.
+ * `null` or `undefined` values will return `undefined` instead.
+ * Just a shortcut for `toDateTime(anyDate, locale).toTimezone(tz, true)`.
+ * @param {AnyDate | null | undefined} anyDate any possible date
+ * @param {string} tz the timezone for the date
+ * @param {string} locale optional locale if provided
+ * @returns {DateTime | undefined}
+ */
+toDateTime.as = (anyDate, tz, locale) => toDateTime(anyDate, locale).toTimezone(tz, true);
 
 /**
  * Format a date to a date-only format
@@ -213,6 +240,8 @@ function convertDurationToTimeUnit(durationInput, toTimeUnit, precise = true) {
 module.exports = {
     DateOnly,
     DateTime,
+    getDefaultTimeZone,
+    setDefaultTimeZone,
     isDateValid,
     getDateLocale,
     LOCALE_FORMATS,

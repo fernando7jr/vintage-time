@@ -1,6 +1,8 @@
 const moment = require('moment-timezone');
 
 const {
+    getDefaultTimeZone,
+    setDefaultTimeZone,
     isDateValid,
     getDateLocale,
     toJsDate,
@@ -15,6 +17,7 @@ const {
     DateOnly,
     DateTime,
 } = require('../index.cjs');
+const {getLocalTimezone} = require('../utils/tz.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_US_LOCALE = 'en-US';
@@ -331,6 +334,30 @@ describe('Date & Locale utils', () => {
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T19:33:44.222Z');
+            expect(result.locale).toBe(CUSTOM_LOCALE);
+        });
+
+        it('should have a sub-method as', () => {
+            let result = toDateTime.as('2000-07-09T22:33:44.222-03:00', 'UTC');
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toString()).toBe('2000-07-09T22:33:44.222Z');
+            expect(result.locale).toBe(DEFAULT_LOCALE);
+            result = toDateTime.as('2000-07-09T22:33:44.222Z', 'America/Sao_Paulo');
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toISOString()).toBe('2000-07-09T22:33:44.222-03:00');
+            expect(result.locale).toBe(DEFAULT_LOCALE);
+
+            result = toDateTime.as('2000-07-09T22:33:44.222+03:00', 'UTC', CUSTOM_LOCALE);
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toString()).toBe('2000-07-09T22:33:44.222Z');
+            expect(result.locale).toBe(CUSTOM_LOCALE);
+            result = toDateTime.as('2000-07-09T22:33:44.222Z', 'America/Sao_Paulo', CUSTOM_LOCALE);
+            expect(result).toBeDefined();
+            expect(result.isDateTime).toBe(true);
+            expect(result.toString()).toBe('2000-07-09T22:33:44.222-03:00');
             expect(result.locale).toBe(CUSTOM_LOCALE);
         });
     });
@@ -1061,6 +1088,43 @@ describe('Date & Locale utils', () => {
             const stringValues = '2000-07-09T22:33:44.222+03:00';
             const result = formatToDateTimeWithLocale(stringValues)
             expect(result).toBe('July 9, 2000 10:33 PM')
+        });
+    });
+
+    describe('getDefaultTimeZone and setDefaultTimeZone', () => {
+        afterEach(() => {
+            setDefaultTimeZone();
+        });
+
+        it('should get the default timezone', () => {
+            const result = getDefaultTimeZone();
+            expect(result).toBe(getLocalTimezone());
+        });
+
+        it('should change the default timezone', () => {
+            setDefaultTimeZone('America/Sao_Paulo');
+            let result = getDefaultTimeZone();
+            expect(result).toBe('America/Sao_Paulo');
+            setDefaultTimeZone();
+            result = getDefaultTimeZone();
+            expect(result).toBe(getLocalTimezone());
+        });
+
+        it('should use the default timezone for DateTime', () => {
+            const timezones = [
+                'America/Sao_Paulo',
+                'Asia/Tokyo',
+                'UTC',
+            ];
+            const result = timezones.map((tz) => {
+                setDefaultTimeZone(tz);
+                const dateTimeNow = toDateTime.now();
+                return dateTimeNow.timezone;
+            });
+            expect(result).toEqual(timezones);
+
+            setDefaultTimeZone(undefined);
+            expect(toDateTime.now().timezone).toEqual(getLocalTimezone());
         });
     });
 
