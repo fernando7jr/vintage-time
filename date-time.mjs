@@ -617,10 +617,24 @@ export class DateTime {
     /**
      * Move this DateTime to a different timezone. The new offset is applied.
      * @param {string} timezone the new timezone
+     * @param {boolean} keepLocalTime optional boolean for keeping the original date and time instead of shifting to the new offset. Defaults to `false`
      * @returns {DateTime} a new DateTime using the specified timezone
      */
-    toTimezone(timezone) {
-        return DateTime.fromMomentDate(moment.tz(this._timestamp, timezone), this._locale);
+    toTimezone(timezone, keepLocalTime = false) {
+        let momentDate = moment(this._timestamp).tz(timezone);
+        if (keepLocalTime) {
+            const thisMoment = _momentDate(this);
+            momentDate.set({
+                year: thisMoment.year(),
+                month: thisMoment.month(),
+                date: thisMoment.date(),
+                hours: thisMoment.hours(),
+                minutes: thisMoment.minutes(),
+                seconds: thisMoment.seconds(),
+                milliseconds: thisMoment.milliseconds(),
+            });
+        }
+        return DateTime.fromMomentDate(momentDate, this._locale);
     }
 
     /**

@@ -860,9 +860,10 @@ export class DateTime {
     /**
      * Move this DateTime to a different timezone. The new offset is applied.
      * @param timezone the new timezone
+     * @param keepLocalTime optional boolean for keeping the original date and time instead of shifting to the new offset. Defaults to `false`
      * @returns a new DateTime using the specified timezone
      */
-    toTimezone(timezone: string): DateTime;
+    toTimezone(timezone: string, keepLocalTime?: boolean): DateTime;
 
     /**
      * Same as calling `toTimezone('UTC')`
@@ -1058,6 +1059,18 @@ export class DateTime {
 export type DateFormatingOptions = {locale?: string | boolean; toISOForm?: boolean; format?: string};
 
 /**
+ * Get the default timezone.
+ * @returns the default timezone name
+ */
+export function getDefaultTimeZone(): string;
+
+/**
+ * Set the default timezone to be used instead of the local timezone.
+ * @param timezone the timezone to be set as the default one. `undefined` resets it to the local timezone.
+ */
+export function setDefaultTimeZone(timezone?: string): void;
+
+/**
  * Extract the locale from a date value.
  * Please notice that only Moment, DateOnly and DateTime classes actually store a locale.
  * Other libraries might do so but need to be handled in this code too.
@@ -1161,6 +1174,27 @@ export interface ToDateTime {
      * @returns a new date-time at the specific timezone or undefined
      */
     tz(anyDate: AnyDate | null | undefined, tz: string, locale?: string): DateTime | undefined;
+
+    /**
+     * Convert a date value to DateTime object in a specific timezone but keeping the local time.
+     * `null` or `undefined` values will return `undefined` instead.
+     * Just a shortcut for `toDateTime(anyDate, locale).toTimezone(tz, true)`.
+     * @param anyDate any possible date
+     * @param tz the timezone for the date
+     * @param locale optional locale if provided
+     * @returns a new date-time at the specific timezone
+     */
+    as(anyDate: AnyDate, tz: string, locale?: string): DateTime;
+    /**
+     * Convert a date value to DateTime object in a specific timezone but keeping the local time.
+     * `null` or `undefined` values will return `undefined` instead.
+     * Just a shortcut for `toDateTime(anyDate, locale).toTimezone(tz, true)`.
+     * @param anyDate any possible date
+     * @param tz the timezone for the date
+     * @param locale optional locale if provided
+     * @returns a new date-time at the specific timezone or undefined
+     */
+    as(anyDate: AnyDate | null | undefined, tz: string, locale?: string): DateTime | undefined;
 }
 export const toDateTime: ToDateTime;
 
