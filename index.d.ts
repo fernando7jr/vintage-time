@@ -1240,4 +1240,4 @@ export function formatToDateTimeWithLocale(anyDate: AnyDate | null | undefined, 
  * @param precise whether to return the precise result or round it to the nearest integer (`Math.floor` is used). Defaults to `true`
  * @returns the amount in the requested time unit. `NaN` when the duration is invalid.
  */
-export function convertDurationToTimeUnit(durationInput: FromTo | DurationInputObject, toTimeUnit: unitOfTime.Base, precise = true): number;
+export function convertDurationToTimeUnit(durationInput: FromTo | DurationInputObject, toTimeUnit: unitOfTime.Base, precise?: boolean): number;
