@@ -1,3 +1,13 @@
+const moment = require('moment-timezone');
+
+/**
+ * Return the local timezone
+ * @returns {string}
+ */
+function getLocalLocale() {
+    return moment().locale();
+}
+
 /**
  * Return the local timezone
  * @returns {string}
@@ -7,5 +17,6 @@ function getLocalTimezone() {
 }
 
 module.exports = {
+    getLocalLocale,
     getLocalTimezone,
 };

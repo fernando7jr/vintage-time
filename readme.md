@@ -1,6 +1,9 @@
 # vintage-time
 
-[![npm version](https://badge.fury.io/js/vintage-time.svg)](https://badge.fury.io/js/vintage-time)[![codecov](https://codecov.io/gh/fernando7jr/vintage-time/graph/badge.svg?token=OPIEI5SPCJ)](https://codecov.io/gh/fernando7jr/vintage-time)![example workflow](https://github.com/fernando7jr/vintage-time/actions/workflows/node.js.yml/badge.svg)[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
+[![npm version](https://badge.fury.io/js/vintage-time.svg)](https://badge.fury.io/js/vintage-time)
+[![codecov](https://codecov.io/gh/fernando7jr/vintage-time/graph/badge.svg?token=OPIEI5SPCJ)](https://codecov.io/gh/fernando7jr/vintage-time)
+![node test and build workflow](https://github.com/fernando7jr/vintage-time/actions/workflows/node.js.yml/badge.svg)
+[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/dwyl/esta/issues)
 
 
 DateTime x DateOnly library with locale support. Compatible with sequelize, joi and plain javascript Dates
@@ -170,10 +173,115 @@ Calling the method with null or undefined will always return undefined
 
 #### toDateTime.now
 
-Shortcut for calling `DateTime.now()` which returns a DateTime instance from the *current system timestamp*.
+Shortcut for calling `DateTime.now(locale)` which returns a DateTime instance from the *current system timestamp*.
 
 ````javascript
 const dateTime = toDateTime.now(); // Simillar to: toDateTime(new Date())
+````
+
+#### toDateTime.tz
+
+Shortcut for calling `toDateTime(anyDate, locale).toTimezone(tz)` which returns a DateTime instance at a specific timezone.
+
+````javascript
+const dateTime = toDateTime.tz('2023-12-31', 'Asia/Jakarta'); // Change the TZ from UTC to +07:00
+console.log(dateTime.toISOString(false)); // Output "2023-12-31T07:00:00.000+07:00"
+````
+
+#### toDateTime.as
+
+It changes the timezone of the date-time but keeps the original date and time values:
+
+- year
+- month
+- day
+- hour
+- minutes
+- second
+- millisecond
+
+````javascript
+let dateTime = toDateTime.tz('2023-12-31', 'Asia/Jakarta'); // Change the TZ from UTC to +07:00 (shift the offset to the new timezone)
+console.log(dateTime.toISOString(false)); // Output "2023-12-31T07:00:00.000+07:00"
+console.log(dateTime.toISOString(true)); // Output "2023-12-31T07:00:00.000+07:00"
+
+DateTime.isEqual(dateTime, '2023-12-31'); // true
+
+dateTime = toDateTime.as('2023-12-31', 'Asia/Jakarta'); // Change the TZ from UTC to +07:00 keeping the original date and time values
+console.log(dateTime.toISOString(false)); // Output "2023-12-31T00:00:00.000+07:00"
+console.log(dateTime.toISOString(true)); // Output "2023-12-30T17:00:00.000Z"
+
+DateTime.isEqual(dateTime, '2023-12-31'); // false
+````
+
+### Comparing dates
+
+The best approach is to use the built-in methods which check equality properly and convert all values to the proper date class.
+
+* isEqual - checks equality between dates (`===` using `valueOf()`)
+* isBefore - checks dateA < dateB
+* isAfter - checks dateA > dateB
+* isEqualBefore - checks dateA <= dateB
+* isEqualAfter - checks dateA >= dateB
+
+````javascript
+const dateTimeA = toDateTime('2024-01-01T12:44:00.567Z');
+const dateTimeB = toDateTime('2024-01-02T07:33:51.120-03:00');
+const dateOnlyA = toDateOnly(toDateTime);
+const dateOnlyB = toDateOnly(toDateTime);
+
+// Use DateTime for comparing dates for both their date and time values
+console.log(DateTime.isEqual(dateOnlyA, dateOnlyA)); // true
+console.log(DateTime.isEqual(dateTimeA, dateTimeA)); // true
+console.log(DateTime.isEqual(dateOnlyA, dateTimeA)); // false
+console.log(DateTime.isEqual(dateTimeA, dateOnlyA)); // false
+console.log(DateTime.isEqual(dateOnlyA, dateOnlyB)); // false
+console.log(DateTime.isEqualOrBefore(dateOnlyA, dateOnlyB)); // true
+console.log(DateTime.isBefore(dateOnlyA, dateOnlyB)); // true
+console.log(DateTime.isEqualOrAfter(dateOnlyA, dateOnlyB)); // false
+console.log(DateTime.isAfter(dateOnlyA, dateOnlyB)); // false
+
+// Use DateOnly when time does not matter and you only want to check the date parts
+console.log(DateOnly.isEqual(dateOnlyA, dateOnlyA)); // true
+console.log(DateOnly.isEqual(dateTimeA, dateTimeA)); // true
+console.log(DateOnly.isEqual(dateOnlyA, dateTimeA)); // true
+console.log(DateOnly.isEqual(dateTimeA, dateOnlyA)); // true
+console.log(DateOnly.isEqual(dateOnlyA, dateOnlyB)); // false
+console.log(DateOnly.isEqualOrBefore(dateOnlyA, dateOnlyB)); // true
+console.log(DateOnly.isBefore(dateOnlyA, dateOnlyB)); // true
+console.log(DateOnly.isEqualOrAfter(dateOnlyA, dateOnlyB)); // false
+console.log(DateOnly.isAfter(dateOnlyA, dateOnlyB)); // false
+````
+
+Still, it also works through the method `valueOf`. It implicitly works as long as both sides of the operator are values of the same type. In the other situations an explicitly call is necessary.
+
+````javascript
+const dateTimeA = toDateTime('2024-01-01T12:44:00.567Z');
+const dateTimeB = toDateTime('2024-01-02T07:33:51.120-03:00');
+
+console.log(dateTimeA < dateTimeB); // true
+console.log(dateTimeA <= dateTimeB); // true
+console.log(dateTimeA > dateTimeB); // false
+console.log(dateTimeA >= dateTimeB); // false
+
+// Equality - Note that we explicitly use `.valueOf()` here to avoid comparing by reference
+console.log(dateTimeA.valueOf() === toDateOnly(dateTimeA).valueOf()); // true
+console.log(dateTimeA.valueOf() !== dateTimeB.valueOf()); // true
+console.log(dateTimeA.valueOf() !== dateTimeA.valueOf()); // false
+
+const dateOnlyA = toDateOnly(toDateTime);
+const dateOnlyB = toDateOnly(toDateTime);
+
+console.log(dateOnlyA < dateOnlyB); // true
+console.log(dateOnlyA <= dateOnlyB); // true
+console.log(dateOnlyA > dateOnlyB); // false
+console.log(dateOnlyA >= dateOnlyB); // false
+
+// Equality - Note that we explicitly use `.valueOf()` here to avoid comparing by reference
+console.log(dateOnlyA.valueOf() === toDateOnly(dateTimeA).valueOf()); // true
+console.log(dateOnlyA.valueOf() !== dateOnlyB.valueOf()); // true
+console.log(dateOnlyA.valueOf() !== dateOnlyA.valueOf()); // false
+// 
 ````
 
 ## Plugins

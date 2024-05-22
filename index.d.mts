@@ -223,10 +223,18 @@ export class DateOnly {
     readonly isDateOnly: true;
 
     /**
-     * The locale set to this date
-     * Defaults to the global locale if none was provided
+     * The locale set to this date.
+     * Defaults to the global locale if none was provided.
      */
-    readonly locale: string;
+    get locale(): string;
+
+    /**
+     * The locale set to this date.
+     * Defaults to the global locale if none was provided.
+     * `null` and `undefined` values are changed to the default locale.
+     * @param value
+     */
+    set locale(value: string | undefined | null);
 
     /**
      * The year for this date.
@@ -708,10 +716,18 @@ export class DateTime {
     readonly isDateTime: true;
 
     /**
-     * The locale set to this date
-     * @returns the locale set to this date. Defaults to the global locale if none was provided
+     * The locale set to this date.
+     * Defaults to the global locale if none was provided.
      */
-    readonly locale: string;
+    get locale(): string;
+
+    /**
+     * The locale set to this date.
+     * Defaults to the global locale if none was provided.
+     * `null` and `undefined` values are changed to the default locale.
+     * @param value
+     */
+    set locale(value: string | undefined | null);
 
     readonly timezone: string | undefined;
 

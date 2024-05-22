@@ -2,7 +2,7 @@ import moment from 'moment-timezone';
 
 import {DateOnly} from './date-only.mjs';
 import {DateTime} from './date-time.mjs';
-import {getLocalTimezone} from './utils/tz.cjs';
+import {getLocalTimezone} from './utils/local.mjs';
 
 export {LOCALE_FORMATS} from './locale-formats.mjs';
 export {DateOnly} from './date-only.mjs';

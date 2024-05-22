@@ -4,7 +4,7 @@ import {LOCALE_FORMATS} from './locale-formats.mjs';
 import {DATE_ONLY_REGEX, DATE_TIME_REGEX, TIME_WITHOUT_ZONE_REGEX, extractTimezoneOffset} from './regex.mjs';
 import {__isDateTimeObject} from './utils/date-time.mjs';
 import {__isDateOnlyObject} from './utils/date-only.mjs';
-import {getLocalTimezone} from './utils/tz.cjs';
+import {getLocalLocale, getLocalTimezone} from './utils/local.mjs';
 
 /**
  * @typedef {moment.Moment} Moment
@@ -402,7 +402,7 @@ export class DateTime {
      * @param {string | undefined} locale optional locale if provided
      */
     constructor(date, locale) {
-        this._locale = locale ?? moment().locale();
+        this._locale = locale || getLocalLocale();
         if (date instanceof DateTime) {
             this._timestamp = date._timestamp;
             this._timezone = date._timezone;
@@ -424,6 +424,15 @@ export class DateTime {
      */
     get locale() {
         return this._locale;
+    }
+
+    /**
+     * The locale set to this date.
+     * `null` and `undefined` values are changed to the default locale
+     * @param {string | null} value
+     */
+    set locale(locale) {
+        this._locale = locale || getLocalLocale();
     }
 
     get timezone() {
