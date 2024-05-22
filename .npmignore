@@ -5,3 +5,5 @@ prettier.yaml
 *.test.mjs
 __tests__
 jest.config.json
+coverage
+*.lcov
