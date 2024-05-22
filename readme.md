@@ -49,8 +49,8 @@ An alternative to this method is to call `DateOnly.fromAnyDate` directly which h
 let date, dateOnly;
 
 // # Create from a plain objects:
-date = new Date({year: 2024, month: 1, day: 1});
-dateOnly = toDateTime(date.getTime());
+date = {year: 2024, month: 1, day: 1};
+dateOnly = toDateTime(date);
 console.log(dateOnly.toString()); // logs: "2024-01-01"
 
 // # Create from a Date object:
@@ -110,23 +110,23 @@ An alternative to this method is to call `DateOnly.fromAnyDate` directly which h
 let date, dateTime;
 
 // # Create from a plain objects specifying only the date part:
-date = new Date({year: 2024, month: 1, day: 1});
-dateTime = toDateTime(date.getTime());
+date = {year: 2024, month: 1, day: 1};
+dateTime = toDateTime(date);
 console.log(dateTime.toString()); // logs: "2024-01-01"
 
 // # Create from a plain objects specifying the date and time part:
-date = new Date({year: 2024, month: 1, day: 1, hour: 22, second: 1, timezone: 'UTC'});
-dateTime = toDateTime(date.getTime());
+date = {year: 2024, month: 1, day: 1, hour: 22, second: 1, timezone: 'UTC'};
+dateTime = toDateTime(date);
 console.log(dateTime.toString()); // logs: "2024-01-01T22:00:01.000Z"
 
 // # Create from a plain objects specifying the date and time part: (Ommiting timezone automatically picks the local system timezone)
-date = new Date({year: 2024, month: 1, day: 1, hour: 22, second: 1});
-dateTime = toDateTime(date.getTime());
+date = {year: 2024, month: 1, day: 1, hour: 22, second: 1};
+dateTime = toDateTime(date);
 console.log(dateTime.toString()); // logs: "2024-01-01T22:00:01.000" + localTimezoneOffset
 
 // # Create from a plain objects specifying the date and time part: (Timezone offset can be used instead of a timezone name)
-date = new Date({year: 2024, month: 1, day: 1, hour: 22, second: 1, offset: 7});
-dateTime = toDateTime(date.getTime());
+date = {year: 2024, month: 1, day: 1, hour: 22, second: 1, offset: 7};
+dateTime = toDateTime(date);
 console.log(dateTime.toString()); // logs: "2024-01-01T22:00:01.000+07:00"
 
 // # Create from a Date object:
