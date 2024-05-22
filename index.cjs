@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const {DateOnly} = require('./date-only.cjs');
 const {DateTime} = require('./date-time.cjs');
 const {LOCALE_FORMATS} = require('./locale-formats.cjs');
-const {getLocalTimezone} = require('./utils/tz.cjs');
+const {getLocalTimezone} = require('./utils/local.cjs');
 
 /** @typedef {Date | import('moment-timezone').Moment | DateOnly | DateTime | string | number} AnyDate */
 /** @typedef {{locale?: string | boolean; toISOForm?: boolean; format?: string}} DateFormatingOptions */

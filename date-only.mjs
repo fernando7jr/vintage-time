@@ -4,6 +4,7 @@ import {LOCALE_FORMATS} from './locale-formats.mjs';
 import {DATE_ONLY_REGEX} from './regex.mjs';
 import {__isDateTimeObject} from './utils/date-time.mjs';
 import {__isDateOnlyObject} from './utils/date-only.mjs';
+import {getLocalLocale} from './utils/local.mjs';
 
 /**
  * @typedef {moment.Moment} Moment
@@ -394,7 +395,7 @@ export class DateOnly {
      * @private prefer to use any of the static methods instead
      */
     constructor(date, locale) {
-        this._locale = locale ?? moment().locale();
+        this._locale = locale || getLocalLocale();
         if (date instanceof DateOnly) {
             this._year = date._year;
             this._month = date._month;
@@ -414,6 +415,15 @@ export class DateOnly {
      */
     get locale() {
         return this._locale;
+    }
+
+    /**
+     * The locale set to this date.
+     * `null` and `undefined` values are changed to the default locale
+     * @param {string | null} value
+     */
+    set locale(locale) {
+        this._locale = locale || getLocalLocale();
     }
 
     /**

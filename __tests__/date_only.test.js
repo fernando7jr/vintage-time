@@ -1264,9 +1264,13 @@ describe('DateOnly', () => {
                 expect(customLocaleValues.map((v) => v.locale)).toEqual(customLocaleValues.map(() => CUSTOM_LOCALE));
             });
 
-            it('should not be settable', () => {
+            it('should set locale', () => {
                 const dateOnly = toDateOnly.now();
                 dateOnly.locale = CUSTOM_LOCALE;
+                expect(dateOnly.locale).toEqual(CUSTOM_LOCALE);
+                dateOnly.locale = null;
+                expect(dateOnly.locale).toEqual(DEFAULT_LOCALE);
+                dateOnly.locale = undefined;
                 expect(dateOnly.locale).toEqual(DEFAULT_LOCALE);
             });
         });

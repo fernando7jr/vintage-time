@@ -3,7 +3,7 @@ const moment = require('moment-timezone');
 const {DateOnly} = require('../date-only.cjs');
 const {DateTime} = require('../date-time.cjs');
 const {toDateOnly, toDateTime, isDateValid, formatToDateOnly} = require('../index.cjs');
-const {getLocalTimezone} = require('../utils/tz.cjs');
+const {getLocalTimezone} = require('../utils/local.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_LOCALE = 'en';
@@ -2019,9 +2019,13 @@ describe('DateTime', () => {
                 expect(customLocaleValues.map((v) => v.locale)).toEqual(customLocaleValues.map(() => CUSTOM_LOCALE));
             });
 
-            it('should not be settable', () => {
+            it('should set locale', () => {
                 const dateTime = toDateTime.now();
                 dateTime.locale = CUSTOM_LOCALE;
+                expect(dateTime.locale).toEqual(CUSTOM_LOCALE);
+                dateTime.locale = null;
+                expect(dateTime.locale).toEqual(DEFAULT_LOCALE);
+                dateTime.locale = undefined;
                 expect(dateTime.locale).toEqual(DEFAULT_LOCALE);
             });
         });

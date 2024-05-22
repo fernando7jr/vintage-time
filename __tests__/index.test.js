@@ -17,7 +17,7 @@ const {
     DateOnly,
     DateTime,
 } = require('../index.cjs');
-const {getLocalTimezone} = require('../utils/tz.cjs');
+const {getLocalTimezone} = require('../utils/local.cjs');
 
 const DEFAULT_LOCALE = moment().locale();
 const ENGLISH_US_LOCALE = 'en-US';
@@ -329,36 +329,49 @@ describe('Date & Locale utils', () => {
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T19:33:44.222Z');
             expect(result.locale).toBe(DEFAULT_LOCALE);
+            expect(DateTime.isEqual(result, '2000-07-09T22:33:44.222+03:00')).toBe(true);
 
             result = toDateTime.tz('2000-07-09T22:33:44.222+03:00', 'UTC', CUSTOM_LOCALE);
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T19:33:44.222Z');
             expect(result.locale).toBe(CUSTOM_LOCALE);
+            expect(DateTime.isEqual(result, '2000-07-09T22:33:44.222+03:00')).toBe(true);
         });
 
         it('should have a sub-method as', () => {
-            let result = toDateTime.as('2000-07-09T22:33:44.222-03:00', 'UTC');
+            let dateString = '2000-07-09T22:33:44.222-03:00';
+            let result = toDateTime.as(dateString, 'UTC');
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T22:33:44.222Z');
             expect(result.locale).toBe(DEFAULT_LOCALE);
-            result = toDateTime.as('2000-07-09T22:33:44.222Z', 'America/Sao_Paulo');
+            expect(DateTime.isEqual(result, dateString)).toBe(false);
+
+            dateString = '2000-07-09T22:33:44.222Z';
+            result = toDateTime.as(dateString, 'America/Sao_Paulo');
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toISOString()).toBe('2000-07-09T22:33:44.222-03:00');
             expect(result.locale).toBe(DEFAULT_LOCALE);
+            expect(DateTime.isEqual(result, dateString)).toBe(false);
 
-            result = toDateTime.as('2000-07-09T22:33:44.222+03:00', 'UTC', CUSTOM_LOCALE);
+            // Using CUSTOM_LOCALE
+            dateString = '2000-07-09T22:33:44.222+03:00';
+            result = toDateTime.as(dateString, 'UTC', CUSTOM_LOCALE);
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T22:33:44.222Z');
             expect(result.locale).toBe(CUSTOM_LOCALE);
-            result = toDateTime.as('2000-07-09T22:33:44.222Z', 'America/Sao_Paulo', CUSTOM_LOCALE);
+            expect(DateTime.isEqual(result, dateString)).toBe(false);
+
+            dateString = '2000-07-09T22:33:44.222Z';
+            result = toDateTime.as(dateString, 'America/Sao_Paulo', CUSTOM_LOCALE);
             expect(result).toBeDefined();
             expect(result.isDateTime).toBe(true);
             expect(result.toString()).toBe('2000-07-09T22:33:44.222-03:00');
             expect(result.locale).toBe(CUSTOM_LOCALE);
+            expect(DateTime.isEqual(result, dateString)).toBe(false);
         });
     });
 

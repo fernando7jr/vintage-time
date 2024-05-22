@@ -4,6 +4,7 @@ const {LOCALE_FORMATS} = require('./locale-formats.cjs');
 const {DATE_ONLY_REGEX} = require('./regex.cjs');
 const {__isDateTimeObject} = require('./utils/date-time.cjs');
 const {__isDateOnlyObject} = require('./utils/date-only.cjs');
+const {getLocalLocale} = require('./utils/local.cjs');
 
 /**
  * @typedef {moment.Moment} Moment
@@ -394,7 +395,7 @@ class DateOnly {
      * @private prefer to use any of the static methods instead
      */
     constructor(date, locale) {
-        this._locale = locale ?? moment().locale();
+        this._locale = locale || getLocalLocale();
         if (date instanceof DateOnly) {
             this._year = date._year;
             this._month = date._month;
@@ -414,6 +415,15 @@ class DateOnly {
      */
     get locale() {
         return this._locale;
+    }
+
+    /**
+     * The locale set to this date.
+     * `null` and `undefined` values are changed to the default locale
+     * @param {string | null} value
+     */
+    set locale(locale) {
+        this._locale = locale || getLocalLocale();
     }
 
     /**
